@@ -266,21 +266,27 @@ const Feed: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50" style={{padding: '0 40px'}}>
             <nav className="bg-white shadow-sm sticky top-0 z-10">
-                <div className="max-w-4xl mx-auto px-4 py-4">
+                <div className="max-w-4xl mx-auto px-8 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                             <Globe className="w-8 h-8 text-indigo-600" />
                             <h1 className="text-2xl font-bold text-indigo-600">TravelShare</h1>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <button onClick={() => setShowFilters(!showFilters)} className="p-2 hover:bg-gray-100 rounded-lg"><Filter className="w-6 h-6" /></button>
-                            <button onClick={() => setView('create')} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 flex items-center space-x-2">
-                                <Camera className="w-5 h-5" /><span className="hidden sm:inline">Share</span>
+                            <button onClick={() => setShowFilters(!showFilters)} className="flex items-center space-x-1 px-3 py-2 hover:bg-gray-100 rounded-lg text-sm text-gray-600">
+                                <Filter className="w-5 h-5" /><span>Filter</span>
                             </button>
-                            <button onClick={() => setView('profile')} className="p-2 hover:bg-gray-100 rounded-lg"><User className="w-6 h-6" /></button>
-                            <button onClick={logout} className="p-2 hover:bg-gray-100 rounded-lg"><LogOut className="w-6 h-6" /></button>
+                            <button onClick={() => setView('create')} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 flex items-center space-x-2">
+                                <Camera className="w-5 h-5" /><span>Share</span>
+                            </button>
+                            <button onClick={() => setView('profile')} className="flex items-center space-x-1 px-3 py-2 hover:bg-gray-100 rounded-lg text-sm text-gray-600">
+                                <User className="w-5 h-5" /><span>Profile</span>
+                            </button>
+                            <button onClick={logout} className="flex items-center space-x-1 px-3 py-2 hover:bg-red-50 rounded-lg text-sm text-red-500">
+                                <LogOut className="w-5 h-5" /><span>Log out</span>
+                            </button>
                         </div>
                     </div>
                     {showFilters && (
@@ -298,7 +304,7 @@ const Feed: React.FC = () => {
                     )}
                 </div>
             </nav>
-            <div className="max-w-4xl mx-auto p-4 space-y-6">
+            <div className="max-w-4xl mx-auto px-8 py-4 space-y-6">
                 {isLoading && <div className="text-center text-gray-500 py-12">Loading posts...</div>}
                 {!isLoading && filteredPosts.length === 0 && (
                     <div className="bg-white rounded-xl shadow-md p-12 text-center">
@@ -308,7 +314,7 @@ const Feed: React.FC = () => {
                     </div>
                 )}
                 {!isLoading && filteredPosts.map((post) => (
-                    <div key={post.id} className="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div key={post.id} className="bg-white rounded-xl shadow-md overflow-hidden mx-2">
                         <div className="p-6">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center space-x-3">
@@ -331,7 +337,7 @@ const Feed: React.FC = () => {
                                 <img
                                     src={post.images[0]}
                                     alt={post.title}
-                                    className="w-full h-64 object-cover rounded-lg mb-4"
+                                    className="w-full rounded-lg mb-4" style={{maxHeight: '300px', objectFit: 'contain', backgroundColor: '#f3f4f6'}}
                                     onError={(e) => {
                                         console.error('Image failed to load:', post.images[0]);
                                         e.currentTarget.style.display = 'none';
