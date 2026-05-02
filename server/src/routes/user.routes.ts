@@ -2,6 +2,7 @@ import express from 'express';
 import { userController } from '../controllers/user.controller';
 import { authMiddleware } from '../middleware/auth.middleware';
 
+
 const router = express.Router();
 
 // GET /api/users/profile - Get current user profile (Protected)
@@ -9,6 +10,9 @@ router.get('/profile', authMiddleware, userController.getProfile);
 
 // PUT /api/users/update - Update user profile (Protected)
 router.put('/update', authMiddleware, userController.updateProfile);
+
+// PUT /api/users/credentials - Update email and password (Protected)
+router.put('/credentials', authMiddleware, userController.updateCredentials);
 
 // GET /api/users/search - Search users by username
 router.get('/search', userController.searchUsers);

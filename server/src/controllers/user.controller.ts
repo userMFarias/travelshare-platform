@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { User } from '../models/User.model';
 import { Favorite } from '../models/Favorite.model';
+import bcrypt from 'bcryptjs';
 
 class UserController {
     async getProfile(req: Request, res: Response): Promise<void> {
@@ -130,6 +131,35 @@ class UserController {
             res.status(500).json({ message: 'Server error', error });
         }
     }
+
+
+async updateCredentials(req: Request, res: Response): Promise<void> {
+        try {
+            const { email, currentPassword, newPassword } = req.body;
+            const user = await User.findById(req.user?.userId).select('+password');
+            if (!user) {
+                res.status(404).json({ message: 'User not found' });
+                return;
+            }
+
+            // Verify current password
+            const isMatch = await bcrypt.compare(currentPassword, user.password);
+            if (!isMatch) {
+                res.status(400).json({ message: 'Current password is incorrect' });
+                return;
+            }
+
+            if (email) user.email = email;
+            if (newPassword) user.password = await bcrypt.hash(newPassword, 10);
+            await user.save();
+
+            res.json({ message: 'Credentials updated successfully' });
+        } catch (error) {
+            res.status(500).json({ message: 'Server error', error });
+        }
+    }
+
 }
+
 
 export const userController = new UserController();

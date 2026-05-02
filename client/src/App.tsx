@@ -185,33 +185,76 @@ const CreatePost: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 // PROFILE SCREEN
 // ================================================================
 const Profile: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-    const { currentUser } = useAuth();
+    const { currentUser, updateProfile } = useAuth();
     const { posts } = usePost();
     const userPosts = posts.filter((p) => p.userId === currentUser?.id);
+    const [editMode, setEditMode] = useState(false);
+    const [form, setForm] = useState({ username: currentUser?.username || '', bio: currentUser?.bio || '', country: currentUser?.country || '', avatar: currentUser?.avatar || '' });
+    const [credForm, setCredForm] = useState({ email: currentUser?.email || '', currentPassword: '', newPassword: '', confirmPassword: '' });
+    const [success, setSuccess] = useState('');
+    const [error, setError] = useState('');
+
+    const handleUpdateProfile = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await updateProfile(form);
+            setSuccess('Profile updated successfully!');
+            setEditMode(false);
+        } catch (err: any) {
+            setError(err.message || 'Failed to update profile');
+        }
+    };
+
+    const handleUpdateCredentials = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (credForm.newPassword && credForm.newPassword !== credForm.confirmPassword) {
+            setError('New passwords do not match'); return;
+        }
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('http://localhost:5000/api/users/credentials', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ email: credForm.email, currentPassword: credForm.currentPassword, newPassword: credForm.newPassword || undefined })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message);
+            setSuccess('Credentials updated! Please log in again.');
+        } catch (err: any) {
+            setError(err.message || 'Failed to update credentials');
+        }
+    };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50" style={{padding: '0 40px'}}>
             <nav className="bg-white shadow-sm sticky top-0 z-10">
                 <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
                     <h1 className="text-2xl font-bold text-indigo-600">Profile</h1>
                     <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-6 h-6" /></button>
                 </div>
             </nav>
-            <div className="max-w-4xl mx-auto p-4">
-                <div className="bg-white rounded-xl shadow-md p-6 mb-6">
-                    <div className="flex items-center space-x-4">
-                        <div className="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center">
-                            <User className="w-10 h-10 text-white" />
+            <div className="max-w-4xl mx-auto px-8 space-y-6">
+                {success && <div className="bg-green-50 text-green-700 px-4 py-3 rounded-lg">{success}</div>}
+                {error && <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg">{error}</div>}
+
+                {/* PROFILE CARD */}
+                <div className="bg-white rounded-xl shadow-md p-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-4">
+                            <div className="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center overflow-hidden">
+                                {form.avatar ? <img src={form.avatar} alt="avatar" className="w-full h-full object-cover" /> : <User className="w-10 h-10 text-white" />}
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-bold text-gray-800">{currentUser?.username}</h2>
+                                <p className="text-gray-500">{currentUser?.email}</p>
+                                {currentUser?.country && <p className="text-gray-500 flex items-center mt-1"><MapPin className="w-4 h-4 mr-1" />{currentUser.country}</p>}
+                            </div>
                         </div>
-                        <div>
-                            <h2 className="text-2xl font-bold text-gray-800">{currentUser?.username}</h2>
-                            <p className="text-gray-500">{currentUser?.email}</p>
-                            {currentUser?.country && (
-                                <p className="text-gray-500 flex items-center mt-1"><MapPin className="w-4 h-4 mr-1" />{currentUser.country}</p>
-                            )}
-                        </div>
+                        <button onClick={() => { setEditMode(!editMode); setSuccess(''); setError(''); }} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm">
+                            {editMode ? 'Cancel' : 'Edit Profile'}
+                        </button>
                     </div>
-                    {currentUser?.bio && <p className="text-gray-700 mt-4">{currentUser.bio}</p>}
+                    {currentUser?.bio && !editMode && <p className="text-gray-700">{currentUser.bio}</p>}
                     <div className="mt-4 flex space-x-6">
                         <div className="text-center">
                             <div className="text-2xl font-bold text-indigo-600">{userPosts.length}</div>
@@ -219,7 +262,58 @@ const Profile: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         </div>
                     </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-4">My Posts</h3>
+
+                {/* EDIT PROFILE FORM */}
+                {editMode && (
+                    <div className="bg-white rounded-xl shadow-md p-6 space-y-6">
+                        {/* Basic info */}
+                        <form onSubmit={handleUpdateProfile} className="space-y-4">
+                            <h3 className="text-lg font-bold text-gray-800 border-b pb-2">Edit Profile Info</h3>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Avatar URL</label>
+                                <input type="url" value={form.avatar} onChange={(e) => setForm({ ...form, avatar: e.target.value })} placeholder="https://example.com/photo.jpg" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                                <input type="text" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                                <input type="text" value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                                <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                            </div>
+                            <button type="submit" className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 font-semibold">Save Profile</button>
+                        </form>
+
+                        {/* Credentials */}
+                        <form onSubmit={handleUpdateCredentials} className="space-y-4 border-t pt-6">
+                            <h3 className="text-lg font-bold text-gray-800 border-b pb-2">Change Email / Password</h3>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">New Email</label>
+                                <input type="email" value={credForm.email} onChange={(e) => setCredForm({ ...credForm, email: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Current Password <span className="text-red-500">*</span></label>
+                                <input type="password" value={credForm.currentPassword} onChange={(e) => setCredForm({ ...credForm, currentPassword: e.target.value })} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">New Password (optional)</label>
+                                <input type="password" value={credForm.newPassword} onChange={(e) => setCredForm({ ...credForm, newPassword: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                                <input type="password" value={credForm.confirmPassword} onChange={(e) => setCredForm({ ...credForm, confirmPassword: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                            </div>
+                            <button type="submit" className="w-full bg-gray-800 text-white py-2 rounded-lg hover:bg-gray-900 font-semibold">Update Email / Password</button>
+                        </form>
+                    </div>
+                )}
+
+                {/* MY POSTS */}
+                <h3 className="text-xl font-bold text-gray-800">My Posts</h3>
                 {userPosts.length === 0 ? (
                     <div className="bg-white rounded-xl shadow-md p-8 text-center">
                         <Camera className="w-16 h-16 text-gray-400 mx-auto mb-4" />
