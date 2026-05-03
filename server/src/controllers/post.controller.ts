@@ -27,6 +27,7 @@ class PostController {
             const post = await Post.create({
                 userId: user._id,
                 username: user.username,
+                avatar: user.avatar || '',
                 country,
                 region,
                 title,
@@ -37,10 +38,14 @@ class PostController {
             });
 
             res.status(201).json({ message: 'Post created successfully', post });
-        } catch (error) {
-            res.status(500).json({ message: 'Server error', error });
+            } catch (error: any) {
+            console.error('CREATE POST ERROR:', error.message, error.errors);
+            const validationErrors = error.errors 
+                ? Object.values(error.errors).map((e: any) => e.message).join(', ')
+                : 'Server error';
+            res.status(500).json({ message: validationErrors });
+            }
         }
-    }
 
     async getPostById(req: Request, res: Response): Promise<void> {
         try {

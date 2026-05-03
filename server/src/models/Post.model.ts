@@ -11,6 +11,7 @@ export interface IComment {
 export interface IPost extends Document {
     userId: mongoose.Types.ObjectId;
     username: string;
+    avatar: string;
     country: string;
     region: string;
     title: string;
@@ -60,6 +61,10 @@ const PostSchema = new Schema<IPost>(
             type: String,
             required: true
         },
+        avatar: {
+            type: String,
+            default: ''
+        },
         country: {
             type: String,
             required: [true, 'Country is required'],
@@ -76,13 +81,13 @@ const PostSchema = new Schema<IPost>(
             type: String,
             required: [true, 'Title is required'],
             trim: true,
-            minlength: [5, 'Title must be at least 5 characters'],
+            minlength: [3, 'Title must be at least 5 characters'],
             maxlength: [200, 'Title cannot exceed 200 characters']
         },
         content: {
             type: String,
             required: [true, 'Content is required'],
-            minlength: [10, 'Content must be at least 10 characters'],
+            minlength: [3, 'Content must be at least 10 characters'],
             maxlength: [5000, 'Content cannot exceed 5000 characters']
         },
         images: {

@@ -398,81 +398,119 @@ const Feed: React.FC = () => {
                     )}
                 </div>
             </nav>
-            <div className="max-w-4xl mx-auto px-8 py-4 space-y-6">
-                {isLoading && <div className="text-center text-gray-500 py-12">Loading posts...</div>}
-                {!isLoading && filteredPosts.length === 0 && (
-                    <div className="bg-white rounded-xl shadow-md p-12 text-center">
-                        <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-500">No posts found</p>
-                        <button onClick={() => setSearchFilters({ country: '', experienceType: '', priceRange: '' })} className="mt-4 text-indigo-600 hover:text-indigo-700 font-medium">Clear filters</button>
-                    </div>
-                )}
-                {!isLoading && filteredPosts.map((post) => (
-                    <div key={post.id} className="bg-white rounded-xl shadow-md overflow-hidden mx-2">
-                        <div className="p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center space-x-3">
-                                    <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center">
-                                        <User className="w-6 h-6 text-white" />
+            <div style={{display: 'flex', gap: '48px', padding: '16px 32px', alignItems: 'flex-start', width:'100%'}}>
+
+                {/* COLUMN — FEED */}
+                <div className="flex-1 space-y-6 min-w-0 max-w-2xl">
+                    <h2 className="text-lg font-bold text-gray-700 border-b pb-2"> Recent Posts</h2>
+                    {isLoading && <div className="text-center text-gray-500 py-12">Loading posts...</div>}
+                    {!isLoading && filteredPosts.length === 0 && (
+                        <div className="bg-white rounded-xl shadow-md p-12 text-center">
+                            <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                            <p className="text-gray-500">No posts found</p>
+                            <button onClick={() => setSearchFilters({ country: '', experienceType: '', priceRange: '' })} className="mt-4 text-indigo-600 hover:text-indigo-700 font-medium">Clear filters</button>
+                        </div>
+                    )}
+                    {!isLoading && filteredPosts.map((post) => (
+                        <div key={post.id} className="bg-white rounded-xl shadow-md overflow-hidden">
+                            <div className="p-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center space-x-3">
+                                        <div style={{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', backgroundColor: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+                                            {post.avatar ? <img src={post.avatar} alt={post.username} style={{width: '100%', height: '100%', objectFit: 'cover'}} /> : <User className="w-6 h-6 text-white" />}
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-gray-800">{post.username}</p>
+                                            <p className="text-sm text-gray-500 flex items-center"><MapPin className="w-3 h-3 mr-1" />{post.country}, {post.region}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="font-semibold text-gray-800">{post.username}</p>
-                                        <p className="text-sm text-gray-500 flex items-center"><MapPin className="w-3 h-3 mr-1" />{post.country}, {post.region}</p>
+                                    <div style={{display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end'}}>
+                                        <span className="text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">{post.experienceType}</span>
+                                        {post.priceRange && <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full">{post.priceRange}</span>}
                                     </div>
                                 </div>
-                                <div className="flex items-center space-x-2">
-                                    <span className="text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">{post.experienceType}</span>
-                                    {post.priceRange && <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full">{post.priceRange}</span>}
-                                </div>
-                            </div>
-                            <h3 className="text-xl font-bold text-gray-800 mb-2">{post.title}</h3>
-                            <p className="text-gray-700 mb-4">{post.content}</p>
-                            {post.images && post.images.length > 0 && post.images[0] && (
-                                <img
-                                    src={post.images[0]}
-                                    alt={post.title}
-                                    className="w-full rounded-lg mb-4" style={{maxHeight: '300px', objectFit: 'contain', backgroundColor: '#f3f4f6'}}
-                                    onError={(e) => {
-                                        console.error('Image failed to load:', post.images[0]);
-                                        e.currentTarget.style.display = 'none';
-                                    }}
-                                />
-                            )}
-                            <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                                <div className="flex items-center space-x-4">
-                                    <button onClick={() => toggleLike(post.id)} className={`flex items-center space-x-1 ${post.isLiked ? 'text-red-600' : 'text-gray-500'} hover:text-red-600`}>
-                                        <Heart className={`w-5 h-5 ${post.isLiked ? 'fill-current' : ''}`} />
-                                        <span>{post.likes}</span>
-                                    </button>
-                                    <button onClick={() => setOpenComments(openComments === post.id ? null : post.id)} className="flex items-center space-x-1 text-gray-500 hover:text-indigo-600">
-                                        <MessageSquare className="w-5 h-5" />
-                                        <span>{post.comments?.length || 0}</span>
-                                    </button>
-                                </div>
-                            </div>
-                            {openComments === post.id && (
-                                <div className="mt-4 pt-4 border-t border-gray-200">
-                                    <h4 className="font-semibold text-gray-800 mb-3">Comments</h4>
-                                    <div className="space-y-3 mb-4">
-                                        {post.comments?.map((comment, i) => (
-                                            <div key={i} className="bg-gray-50 rounded-lg p-3">
-                                                <p className="font-semibold text-sm text-gray-800">{comment.username}</p>
-                                                <p className="text-gray-700 text-sm">{comment.content}</p>
-                                                <p className="text-xs text-gray-400 mt-1">{comment.createdAt}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className="flex space-x-2">
-                                        <input type="text" value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Add a comment..." className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
-                                        <button onClick={() => handleComment(post.id)} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
-                                            <Send className="w-5 h-5" />
+                                <h3 className="text-xl font-bold text-gray-800 mb-2">{post.title}</h3>
+                                <p className="text-gray-700 mb-4">{post.content}</p>
+                                {post.images && post.images.length > 0 && post.images[0] && (
+                                    <img
+                                        src={post.images[0]}
+                                        alt={post.title}
+                                        className="w-full rounded-lg mb-4" style={{maxHeight: '300px', objectFit: 'contain', backgroundColor: '#f3f4f6'}}
+                                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                    />
+                                )}
+                                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                                    <div className="flex items-center space-x-4">
+                                        <button onClick={() => toggleLike(post.id)} className={`flex items-center space-x-1 ${post.isLiked ? 'text-red-600' : 'text-gray-500'} hover:text-red-600`}>
+                                            <Heart className={`w-5 h-5 ${post.isLiked ? 'fill-current' : ''}`} />
+                                            <span>{post.likes}</span>
+                                        </button>
+                                        <button onClick={() => setOpenComments(openComments === post.id ? null : post.id)} className="flex items-center space-x-1 text-gray-500 hover:text-indigo-600">
+                                            <MessageSquare className="w-5 h-5" />
+                                            <span>{post.comments?.length || 0}</span>
                                         </button>
                                     </div>
                                 </div>
-                            )}
+                                {openComments === post.id && (
+                                    <div className="mt-4 pt-4 border-t border-gray-200">
+                                        <h4 className="font-semibold text-gray-800 mb-3">Comments</h4>
+                                        <div className="space-y-3 mb-4">
+                                            {post.comments?.map((comment, i) => (
+                                                <div key={i} className="bg-gray-50 rounded-lg p-3">
+                                                    <p className="font-semibold text-sm text-gray-800">{comment.username}</p>
+                                                    <p className="text-gray-700 text-sm">{comment.content}</p>
+                                                    <p className="text-xs text-gray-400 mt-1">{comment.createdAt}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="flex space-x-2">
+                                            <input type="text" value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Add a comment..." className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                                            <button onClick={() => handleComment(post.id)} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                                                <Send className="w-5 h-5" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
+                    ))}
+                </div>
+
+                {/* COLUMN — EXPLORE */}
+                <div className="w-80 flex-shrink-0 space-y-4 sticky top-20 ml-4">
+                    <h2 className="text-lg font-bold text-gray-700 border-b pb-2"> Explore</h2>
+                    <div className="bg-white rounded-xl shadow-md p-4 space-y-3">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                            <input type="text" placeholder="e.g. Japan, Italy..." value={searchFilters.country} onChange={(e) => setSearchFilters({ ...searchFilters, country: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Experience Type</label>
+                            <select value={searchFilters.experienceType} onChange={(e) => setSearchFilters({ ...searchFilters, experienceType: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm">
+                                <option value="">All Types</option>
+                                {EXPERIENCE_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Budget</label>
+                            <select value={searchFilters.priceRange} onChange={(e) => setSearchFilters({ ...searchFilters, priceRange: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm">
+                                <option value="">All Budgets</option>
+                                {PRICE_RANGES.map((p) => <option key={p} value={p}>{p}</option>)}
+                            </select>
+                        </div>
+                        <button onClick={() => setSearchFilters({ country: '', experienceType: '', priceRange: '' })} className="w-full py-2 text-sm text-indigo-600 hover:text-indigo-700 font-medium border border-indigo-200 rounded-lg hover:bg-indigo-50">
+                            Clear filters
+                        </button>
                     </div>
-                ))}
+
+                    {/* Stats box */}
+                    <div className="bg-indigo-50 rounded-xl p-4">
+                        <p className="text-sm font-semibold text-indigo-700 mb-2"> Community Stats</p>
+                        <p className="text-sm text-indigo-600">{filteredPosts.length} posts found</p>
+                        <p className="text-sm text-indigo-600">{[...new Set(filteredPosts.map(p => p.country))].length} countries explored</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     );

@@ -11,6 +11,7 @@ export interface Post {
     id: string;
     userId: string;
     username: string;
+    avatar?: string;
     country: string;
     region: string;
     title: string;
