@@ -211,7 +211,7 @@ const Profile: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             setError('New passwords do not match'); return;
         }
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('travel_auth_token');
             const res = await fetch('http://localhost:5000/api/users/credentials', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -270,8 +270,29 @@ const Profile: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         <form onSubmit={handleUpdateProfile} className="space-y-4">
                             <h3 className="text-lg font-bold text-gray-800 border-b pb-2">Edit Profile Info</h3>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Avatar URL</label>
-                                <input type="url" value={form.avatar} onChange={(e) => setForm({ ...form, avatar: e.target.value })} placeholder="https://example.com/photo.jpg" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Avatar</label>
+                                <input type="url" value={form.avatar} onChange={(e) => setForm({ ...form, avatar: e.target.value })} placeholder="https://example.com/photo.jpg" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 mb-2" />
+                                <p className="text-xs text-gray-400 text-center my-1">— or upload from your device —</p>
+                                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+                                    if (!allowed.includes(file.type)) {
+                                        setError('Invalid format. Only JPG, PNG and WEBP are allowed.');
+                                        return;
+                                    }
+                                    const formData = new FormData();
+                                    formData.append('image', file);
+                                    const token = localStorage.getItem('travel_auth_token');
+                                    const res = await fetch('http://localhost:5000/api/upload/image', {
+                                        method: 'POST',
+                                        headers: { 'Authorization': `Bearer ${token}` },
+                                        body: formData
+                                    });
+                                    const data = await res.json();
+                                    if (!res.ok) { setError(data.message); return; }
+                                    setForm({ ...form, avatar: data.url });
+                                }} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-500" />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>

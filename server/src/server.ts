@@ -42,17 +42,17 @@ const connectDB = async (): Promise<void> => {
     try {
         const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/travelshare';
         await mongoose.connect(mongoURI);
-        console.log('✅ MongoDB connected successfully');
+        console.log(' MongoDB connected successfully');
 
         mongoose.connection.on('error', (err) => {
-            console.error('❌ MongoDB connection error:', err);
+            console.error(' MongoDB connection error:', err);
         });
 
         mongoose.connection.on('disconnected', () => {
-            console.warn('⚠️  MongoDB disconnected');
+            console.warn('  MongoDB disconnected');
         });
     } catch (error) {
-        console.error('❌ MongoDB connection failed:', error);
+        console.error(' MongoDB connection failed:', error);
         process.exit(1);
     }
 };
@@ -99,30 +99,30 @@ const startServer = async (): Promise<void> => {
         await connectDB();
 
         app.listen(PORT, () => {
-            console.log(`🚀 Server running on port ${PORT}`);
-            console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-            console.log(`🌐 API URL: http://localhost:${PORT}/api`);
+            console.log(` Server running on port ${PORT}`);
+            console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
+            console.log(` API URL: http://localhost:${PORT}/api`);
         });
     } catch (error) {
-        console.error('❌ Failed to start server:', error);
+        console.error(' Failed to start server:', error);
         process.exit(1);
     }
 };
 
 process.on('unhandledRejection', (err: Error) => {
-    console.error('❌ Unhandled Rejection:', err);
+    console.error(' Unhandled Rejection:', err);
     process.exit(1);
 });
 
 process.on('uncaughtException', (err: Error) => {
-    console.error('❌ Uncaught Exception:', err);
+    console.error(' Uncaught Exception:', err);
     process.exit(1);
 });
 
 process.on('SIGTERM', () => {
-    console.log('👋 SIGTERM received, shutting down gracefully');
+    console.log(' SIGTERM received, shutting down gracefully');
     mongoose.connection.close(false).then(() => {
-        console.log('✅ MongoDB connection closed');
+        console.log(' MongoDB connection closed');
         process.exit(0);
     });
 });
