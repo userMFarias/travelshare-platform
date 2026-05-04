@@ -49,6 +49,7 @@ export interface PostFormData {
     experienceType: string;
     priceRange: string;
     images: string[];
+    videos: string[];
 }
 
 export interface SearchFilters {

@@ -112,7 +112,7 @@ const Register: React.FC<{ onSwitch: () => void }> = ({ onSwitch }) => {
 // ================================================================
 const CreatePost: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const { createPost } = usePost();
-    const [form, setForm] = useState<PostFormData>({ country: '', region: '', title: '', content: '', experienceType: '', priceRange: '', images: [] });
+    const [form, setForm] = useState<PostFormData>({ country: '', region: '', title: '', content: '', experienceType: '', priceRange: '', images: [], videos: [] });
     const [error, setError] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -171,8 +171,48 @@ const CreatePost: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Image URL (optional)</label>
-                        <input type="url" placeholder="https://example.com/image.jpg" onChange={(e) => setForm({ ...form, images: e.target.value ? [e.target.value] : [] })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Photos & Videos (optional, max 10)</label>
+                        <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/mov"
+                            multiple
+                            onChange={async (e) => {
+                                const files = Array.from(e.target.files || []);
+                                if (files.length === 0) return;
+                                if (files.length > 10) {
+                                    setError('You can upload a maximum of 10 files.');
+                                    return;
+                                }
+                                const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg', 'video/mp4', 'video/webm', 'video/mov'];
+                                for (const file of files) {
+                                    if (!allowedTypes.includes(file.type)) {
+                                        setError(`Invalid format: ${file.name}. Only JPG, PNG, WEBP images and MP4, MOV, WEBM videos are allowed.`);
+                                        return;
+                                    }
+                                }
+                                try {
+                                    const formData = new FormData();
+                                    files.forEach(file => formData.append('media', file));
+                                    const token = localStorage.getItem('travel_auth_token');
+                                    const res = await fetch('http://localhost:5000/api/upload/media', {
+                                        method: 'POST',
+                                        headers: { 'Authorization': `Bearer ${token}` },
+                                        body: formData
+                                    });
+                                    const data = await res.json();
+                                    if (!res.ok) { setError(data.message); return; }
+                                    const images = data.files.filter((f: any) => f.type === 'image').map((f: any) => f.url);
+                                    const videos = data.files.filter((f: any) => f.type === 'video').map((f: any) => f.url);
+                                    setForm({ ...form, images, videos });
+                                    setError('');
+                                } catch (err) {
+                                    setError('Error uploading files. Please try again.');
+                                }
+                            }}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-500"
+                        />
+                        {form.images.length > 0 && <p className="text-xs text-green-600 mt-1">{form.images.length} image(s) ready to upload</p>}
+                        {(form as any).videos?.length > 0 && <p className="text-xs text-green-600 mt-1">{(form as any).videos.length} video(s) ready to upload</p>}
                     </div>
                     <button type="submit" className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">Share Experience</button>
                 </form>
@@ -366,6 +406,7 @@ const Feed: React.FC = () => {
     const [showFilters, setShowFilters] = useState(false);
     const [openComments, setOpenComments] = useState<string | null>(null);
     const [commentText, setCommentText] = useState('');
+    const [lightbox, setLightbox] = useState<string | null>(null);
 
     if (view === 'create') return <CreatePost onBack={() => setView('feed')} />;
     if (view === 'profile') return <Profile onBack={() => setView('feed')} />;
@@ -452,14 +493,31 @@ const Feed: React.FC = () => {
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-800 mb-2">{post.title}</h3>
                                 <p className="text-gray-700 mb-4">{post.content}</p>
-                                {post.images && post.images.length > 0 && post.images[0] && (
-                                    <img
-                                        src={post.images[0]}
-                                        alt={post.title}
-                                        className="w-full rounded-lg mb-4" style={{maxHeight: '300px', objectFit: 'contain', backgroundColor: '#f3f4f6'}}
-                                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                    />
-                                )}
+                            {post.images && post.images.length > 0 && (
+                                <div className={`grid gap-2 mb-4 ${post.images.length === 1 ? 'grid-cols-1' : post.images.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+                                    {post.images.map((img, i) => (
+                                        <img
+                                            key={i}
+                                            src={img}
+                                            alt={`${post.title} ${i + 1}`}
+                                            style={{width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px', cursor: 'pointer'}} onClick={() => setLightbox(img)}
+                                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                            {(post as any).videos && (post as any).videos.length > 0 && (
+                                <div className="grid gap-2 mb-4 grid-cols-1">
+                                    {(post as any).videos.map((vid: string, i: number) => (
+                                        <video
+                                            key={i}
+                                            src={vid}
+                                            controls
+                                            style={{width: '100%', maxHeight: '300px', borderRadius: '8px'}}
+                                        />
+                                    ))}
+                                </div>
+                            )}
                                 <div className="flex items-center justify-between pt-4 border-t border-gray-200">
                                     <div className="flex items-center space-x-4">
                                         <button onClick={() => toggleLike(post.id)} className={`flex items-center space-x-1 ${post.isLiked ? 'text-red-600' : 'text-gray-500'} hover:text-red-600`}>
@@ -531,6 +589,15 @@ const Feed: React.FC = () => {
                         <p className="text-sm text-indigo-600">{[...new Set(filteredPosts.map(p => p.country))].length} countries explored</p>
                     </div>
                 </div>
+                {lightbox && (
+                <div
+                    onClick={() => setLightbox(null)}
+                    style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, cursor: 'pointer'}}
+                >
+                    <img src={lightbox} alt="Full size" style={{maxWidth: '90%', maxHeight: '90vh', objectFit: 'contain', borderRadius: '8px'}} />
+                    <button style={{position: 'absolute', top: '20px', right: '30px', color: 'white', fontSize: '36px', background: 'none', border: 'none', cursor: 'pointer'}}>×</button>
+                </div>
+            )}
 
             </div>
         </div>
