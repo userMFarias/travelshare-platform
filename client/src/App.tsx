@@ -68,7 +68,7 @@ const Register: React.FC<{ onSwitch: () => void }> = ({ onSwitch }) => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div style={{minHeight: '100vh', background: 'linear-gradient(135deg, #eff6ff, #e0e7ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px'}}>
             <div style={{backgroundColor: 'white', borderRadius: '16px', boxShadow: '0 20px 60px rgba(0,0,0,0.15)', padding: '40px', width: '100%', maxWidth: '420px'}}>
                 <div className="text-center mb-8">
                     <Globe className="w-16 h-16 text-indigo-600 mx-auto mb-4" />
@@ -79,25 +79,25 @@ const Register: React.FC<{ onSwitch: () => void }> = ({ onSwitch }) => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                        <input type="text" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+                        <input type="text" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} required style={{width: '100%', padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none', fontSize: '14px', boxSizing: 'border-box' as any}} />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+                        <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required style={{width: '100%', padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none', fontSize: '14px', boxSizing: 'border-box' as any}} />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                        <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+                        <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required style={{width: '100%', padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none', fontSize: '14px', boxSizing: 'border-box' as any}} />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
-                        <input type="text" value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+                        <input type="text" value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} style={{width: '100%', padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none', fontSize: '14px', boxSizing: 'border-box' as any}} />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Bio (optional)</label>
-                        <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+                        <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} style={{width: '100%', padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none', fontSize: '14px', boxSizing: 'border-box' as any}} />
                     </div>
-                    <button type="submit" className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">Create Account</button>
+                    <button type="submit" style={{width: '100%', backgroundColor: '#4f46e5', color: 'white', padding: '12px', borderRadius: '8px', fontWeight: '600', border: 'none', cursor: 'pointer', fontSize: '15px', marginTop: '12px'}}>Create Account</button>
                 </form>
                 <div className="mt-6 text-center">
                     <button onClick={onSwitch} className="text-indigo-600 hover:text-indigo-700 font-medium">Already have an account? Log in</button>
