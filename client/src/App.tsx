@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { PostProvider, usePost } from './contexts/PostContext';
 import { PostFormData, SearchFilters, EXPERIENCE_TYPES, PRICE_RANGES } from './types';
-import { Globe, MapPin, Heart, MessageSquare, Search, Filter, Camera, User, LogOut, X, Send } from 'lucide-react';
+import { Globe, Earth, MapPin, Heart, MessageSquare, Search, Filter, Camera, User, LogOut, X, Send } from 'lucide-react';
 
 // ================================================================
 // LOGIN SCREEN
@@ -26,7 +26,7 @@ const Login: React.FC<{ onSwitch: () => void; onHowItWorks: () => void; onHelp: 
         <div style={{minHeight: '100vh', backgroundImage: 'url(https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=1920&q=80)', backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px'}}>
                 <nav style={{position: 'fixed', top: 0, left: 0, right: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 40px', backgroundColor: 'rgba(0,0,0,0.3)', zIndex: 100}}>
                     <div style={{display: 'flex', alignItems: 'center', gap: '8px', color: 'white'}}>
-                        <Globe className="w-6 h-6" />
+                        <Earth className="w-6 h-6" />
                         <span style={{fontWeight: '700', fontSize: '18px'}}>TravelShare</span>
                     </div>
                 <div style={{display: 'flex', gap: '16px'}}>
@@ -36,7 +36,7 @@ const Login: React.FC<{ onSwitch: () => void; onHowItWorks: () => void; onHelp: 
             </nav>
             <div style={{backgroundColor: 'white', borderRadius: '16px', boxShadow: '0 20px 60px rgba(0,0,0,0.15)', padding: '40px', width: '100%', maxWidth: '420px'}}>
                 <div className="text-center mb-8">
-                    <Globe className="w-16 h-16 text-indigo-600 mx-auto mb-4" />
+                    <Earth className="w-16 h-16 text-indigo-600 mx-auto mb-4" />
                     <h1 className="text-3xl font-bold text-gray-800">TravelShare</h1>
                     <p className="text-gray-500 mt-2">Connect with travelers worldwide</p>
                 </div>
@@ -81,7 +81,7 @@ const Register: React.FC<{ onSwitch: () => void; onHowItWorks: () => void; onHel
         <div style={{minHeight: '100vh', backgroundImage: 'url(https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=1920&q=80)', backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px'}}>
             <nav style={{position: 'fixed', top: 0, left: 0, right: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 40px', backgroundColor: 'rgba(0,0,0,0.3)', zIndex: 100}}>
                 <div style={{display: 'flex', alignItems: 'center', gap: '8px', color: 'white'}}>
-                    <Globe className="w-6 h-6" />
+                    <Earth className="w-6 h-6" />
                     <span style={{fontWeight: '700', fontSize: '18px'}}>TravelShare</span>
                 </div>
                 <div style={{display: 'flex', gap: '16px'}}>
@@ -91,7 +91,7 @@ const Register: React.FC<{ onSwitch: () => void; onHowItWorks: () => void; onHel
             </nav>
             <div style={{backgroundColor: 'white', borderRadius: '16px', boxShadow: '0 20px 60px rgba(0,0,0,0.15)', padding: '40px', width: '100%', maxWidth: '420px'}}>
                 <div className="text-center mb-8">
-                    <Globe className="w-16 h-16 text-indigo-600 mx-auto mb-4" />
+                    <Earth className="w-16 h-16 text-indigo-600 mx-auto mb-4" />
                     <h1 className="text-3xl font-bold text-gray-800">Join TravelShare</h1>
                     <p className="text-gray-500 mt-2">Start sharing your adventures</p>
                 </div>
@@ -447,7 +447,7 @@ const Feed: React.FC = () => {
                 <div className="max-w-4xl mx-auto px-8 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                            <Globe className="w-8 h-8 text-indigo-600" />
+                            <Earth className="w-8 h-8 text-indigo-600" />
                             <h1 className="text-2xl font-bold text-indigo-600">TravelShare</h1>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -633,7 +633,7 @@ const HowItWorks: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <div style={{minHeight: '100vh', backgroundColor: '#f8fafc'}}>
             <nav style={{backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', padding: '16px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                 <div style={{display: 'flex', alignItems: 'center', gap: '8px', color: '#4f46e5'}}>
-                    <Globe className="w-6 h-6" />
+                    <Earth className="w-6 h-6" />
                     <span style={{fontWeight: '700', fontSize: '18px'}}>TravelShare</span>
                 </div>
                 <button onClick={onBack} style={{backgroundColor: '#4f46e5', color: 'white', border: 'none', padding: '8px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600'}}>Back to Login</button>
@@ -681,7 +681,7 @@ const Help: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <div style={{minHeight: '100vh', backgroundColor: '#f8fafc'}}>
             <nav style={{backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', padding: '16px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                 <div style={{display: 'flex', alignItems: 'center', gap: '8px', color: '#4f46e5'}}>
-                    <Globe className="w-6 h-6" />
+                    <Earth className="w-6 h-6" />
                     <span style={{fontWeight: '700', fontSize: '18px'}}>TravelShare</span>
                 </div>
                 <button onClick={onBack} style={{backgroundColor: '#4f46e5', color: 'white', border: 'none', padding: '8px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600'}}>Back to Login</button>
