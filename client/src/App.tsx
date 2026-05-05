@@ -493,6 +493,7 @@ const Feed: React.FC = () => {
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-800 mb-2">{post.title}</h3>
                                 <p className="text-gray-700 mb-4">{post.content}</p>
+                                <p className="text-xs text-gray-400 mb-4">{new Date(post.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                             {post.images && post.images.length > 0 && (
                                 <div className={`grid gap-2 mb-4 ${post.images.length === 1 ? 'grid-cols-1' : post.images.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
                                     {post.images.map((img, i) => (
@@ -500,7 +501,7 @@ const Feed: React.FC = () => {
                                             key={i}
                                             src={img}
                                             alt={`${post.title} ${i + 1}`}
-                                            style={{width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px', cursor: 'pointer'}} onClick={() => setLightbox(img)}
+                                            style={{width: '100%', height: post.images.length === 1 ? 'auto' : '200px', maxHeight: post.images.length === 1 ? '400px' : '200px', objectFit: post.images.length === 1 ? 'contain' : 'cover', borderRadius: '8px', cursor: 'pointer', backgroundColor: '#f3f4f6'}} onClick={() => setLightbox(img)}
                                             onError={(e) => { e.currentTarget.style.display = 'none'; }}
                                         />
                                     ))}
@@ -538,7 +539,7 @@ const Feed: React.FC = () => {
                                                 <div key={i} className="bg-gray-50 rounded-lg p-3">
                                                     <p className="font-semibold text-sm text-gray-800">{comment.username}</p>
                                                     <p className="text-gray-700 text-sm">{comment.content}</p>
-                                                    <p className="text-xs text-gray-400 mt-1">{comment.createdAt}</p>
+                                                    <p className="text-xs text-gray-400 mt-1">{new Date(comment.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                                                 </div>
                                             ))}
                                         </div>
