@@ -5,6 +5,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 
 import routes from './routes';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware';
@@ -14,6 +16,13 @@ import { apiLimiter } from './middleware/rateLimit.middleware';
 dotenv.config();
 
 const app: Application = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+    cors: {
+        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+        methods: ['GET', 'POST']
+    }
+});
 const PORT = process.env.PORT || 5000;
 
 // ================================================================
@@ -58,6 +67,35 @@ const connectDB = async (): Promise<void> => {
 };
 
 // ================================================================
+// SOCKET.IO
+// ================================================================
+const onlineUsers = new Map<string, string>();
+
+io.on('connection', (socket) => {
+    console.log('User connected:', socket.id);
+
+    socket.on('user_connected', (userId: string) => {
+        onlineUsers.set(userId, socket.id);
+        io.emit('online_users', Array.from(onlineUsers.keys()));
+    });
+
+    socket.on('send_message', (data: { receiverId: string; message: any }) => {
+        const receiverSocketId = onlineUsers.get(data.receiverId);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit('receive_message', data.message);
+        }
+    });
+
+    socket.on('disconnect', () => {
+        onlineUsers.forEach((socketId, userId) => {
+            if (socketId === socket.id) onlineUsers.delete(userId);
+        });
+        io.emit('online_users', Array.from(onlineUsers.keys()));
+        console.log('User disconnected:', socket.id);
+    });
+});
+
+// ================================================================
 // ROUTES
 // ================================================================
 
@@ -98,7 +136,7 @@ const startServer = async (): Promise<void> => {
     try {
         await connectDB();
 
-        app.listen(PORT, () => {
+        httpServer.listen(PORT, () => {
             console.log(` Server running on port ${PORT}`);
             console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
             console.log(` API URL: http://localhost:${PORT}/api`);
