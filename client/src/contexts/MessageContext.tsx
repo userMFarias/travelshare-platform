@@ -30,6 +30,7 @@ interface MessageContextType {
     loadConversations: () => Promise<void>;
     loadConversation: (userId: string) => Promise<void>;
     sendMessage: (receiverId: string, receiverUsername: string, content: string) => Promise<void>;
+    resetUnreadCount: () => void;
 }
 
 const MessageContext = createContext<MessageContextType | null>(null);
@@ -57,11 +58,29 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ child
         const newSocket = io(SOCKET_URL);
         setSocket(newSocket);
         newSocket.emit('user_connected', currentUser.id);
+        loadConversations(); 
 
         newSocket.on('online_users', (users: string[]) => setOnlineUsers(users));
         newSocket.on('receive_message', (message: Message) => {
             setCurrentMessages(prev => [...prev, message]);
             setUnreadCount(prev => prev + 1);
+            setConversations(prev => {
+                const exists = prev.find(c => c.userId === message.senderId);
+                if (exists) {
+                    return prev.map(c => c.userId === message.senderId
+                        ? { ...c, lastMessage: message.content, unread: true }
+                        : c
+                    );
+                } else {
+                    return [{
+                        userId: message.senderId,
+                        username: message.senderUsername,
+                        lastMessage: message.content,
+                        lastMessageDate: message.createdAt,
+                        unread: true
+                    }, ...prev];
+                }
+            });
         });
 
         return () => { newSocket.disconnect(); };
@@ -109,8 +128,10 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
     };
 
+    const resetUnreadCount = () => setUnreadCount(0);
+
     return (
-        <MessageContext.Provider value={{ socket, conversations, currentMessages, unreadCount, onlineUsers, loadConversations, loadConversation, sendMessage }}>
+        <MessageContext.Provider value={{ socket, conversations, currentMessages, unreadCount, onlineUsers, loadConversations, loadConversation, sendMessage, resetUnreadCount }}>
             {children}
         </MessageContext.Provider>
     );

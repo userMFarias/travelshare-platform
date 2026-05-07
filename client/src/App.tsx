@@ -613,7 +613,7 @@ const Messages: React.FC<{ onBack: () => void; initialUser?: { userId: string; u
 // ================================================================
 const Feed: React.FC = () => {
     const { logout, currentUser } = useAuth();
-    const { unreadCount } = useMessage();
+    const { unreadCount, resetUnreadCount } = useMessage();
     const { filteredPosts, isLoading, searchFilters, setSearchFilters, toggleLike, addComment, addReply, deleteComment } = usePost();
     const [view, setView] = useState<'feed' | 'create' | 'profile' | 'messages'>('feed');
     const [showFilters, setShowFilters] = useState(false);
@@ -658,7 +658,7 @@ const Feed: React.FC = () => {
                             <button onClick={() => setView('create')} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 flex items-center space-x-2">
                                 <Camera className="w-5 h-5" /><span>Share</span>
                             </button>
-                            <button onClick={() => setView('messages')} className="flex items-center space-x-1 px-3 py-2 hover:bg-gray-100 rounded-lg text-sm text-gray-600">
+                            <button onClick={() => { setView('messages'); resetUnreadCount(); }} className="flex items-center space-x-1 px-3 py-2 hover:bg-gray-100 rounded-lg text-sm text-gray-600">
                                 <div style={{position: 'relative'}}>
                                     <MessageSquare className="w-5 h-5" />
                                     {unreadCount > 0 && (
