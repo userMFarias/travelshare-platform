@@ -146,53 +146,62 @@ const CreatePost: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         }
     };
 
-    return (
-        <div className="min-h-screen bg-gray-50">
-            <nav className="bg-white shadow-sm sticky top-0 z-10">
-                <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-                    <h1 className="text-2xl font-bold text-indigo-600">Create Post</h1>
-                    <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-6 h-6" /></button>
+return (
+        <div style={{minHeight: '100vh', backgroundColor: '#f8fafc'}}>
+            <nav style={{backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', padding: '16px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 10}}>
+                <div style={{display: 'flex', alignItems: 'center', gap: '8px', color: '#4f46e5'}}>
+                    <Earth className="w-6 h-6" />
+                    <span style={{fontWeight: '700', fontSize: '18px'}}>TravelShare</span>
                 </div>
+                <h1 style={{fontSize: '20px', fontWeight: '700', color: '#1e293b'}}>Create Post</h1>
+                <button onClick={onBack} style={{background: 'none', border: 'none', cursor: 'pointer', padding: '8px', borderRadius: '8px'}}>
+                    <X style={{width: '24px', height: '24px', color: '#64748b'}} />
+                </button>
             </nav>
-            <div className="max-w-4xl mx-auto p-4">
-                {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-                <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md p-6 space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+            <div style={{maxWidth: '800px', margin: '0 auto', padding: '32px 20px'}}>
+                {error && <p style={{color: '#ef4444', fontSize: '14px', marginBottom: '16px', backgroundColor: '#fef2f2', padding: '12px 16px', borderRadius: '8px'}}>{error}</p>}
+                <form onSubmit={handleSubmit} style={{backgroundColor: 'white', borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', padding: '32px', display: 'flex', flexDirection: 'column', gap: '20px'}}>
+                    
+                    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px'}}>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
-                            <input type="text" value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                            <label style={{display: 'block', fontSize: '14px', fontWeight: '600', color: '#374151', marginBottom: '6px'}}>Country</label>
+                            <input type="text" value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} required style={{width: '100%', padding: '10px 14px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', outline: 'none', boxSizing: 'border-box'}} />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Region / City</label>
-                            <input type="text" value={form.region} onChange={(e) => setForm({ ...form, region: e.target.value })} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                            <label style={{display: 'block', fontSize: '14px', fontWeight: '600', color: '#374151', marginBottom: '6px'}}>Region / City</label>
+                            <input type="text" value={form.region} onChange={(e) => setForm({ ...form, region: e.target.value })} required style={{width: '100%', padding: '10px 14px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', outline: 'none', boxSizing: 'border-box'}} />
                         </div>
                     </div>
+
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                        <input type="text" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                        <label style={{display: 'block', fontSize: '14px', fontWeight: '600', color: '#374151', marginBottom: '6px'}}>Title</label>
+                        <input type="text" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required style={{width: '100%', padding: '10px 14px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', outline: 'none', boxSizing: 'border-box'}} />
                     </div>
+
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Experience Details</label>
-                        <textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} rows={6} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                        <label style={{display: 'block', fontSize: '14px', fontWeight: '600', color: '#374151', marginBottom: '6px'}}>Experience Details</label>
+                        <textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} rows={6} required style={{width: '100%', padding: '10px 14px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', outline: 'none', resize: 'vertical', boxSizing: 'border-box'}} />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+
+                    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px'}}>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Experience Type</label>
-                            <select value={form.experienceType} onChange={(e) => setForm({ ...form, experienceType: e.target.value })} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                            <label style={{display: 'block', fontSize: '14px', fontWeight: '600', color: '#374151', marginBottom: '6px'}}>Experience Type</label>
+                            <select value={form.experienceType} onChange={(e) => setForm({ ...form, experienceType: e.target.value })} required style={{width: '100%', padding: '10px 14px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', outline: 'none', backgroundColor: 'white', boxSizing: 'border-box'}}>
                                 <option value="">Select type</option>
                                 {EXPERIENCE_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Price Range</label>
-                            <select value={form.priceRange} onChange={(e) => setForm({ ...form, priceRange: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                            <label style={{display: 'block', fontSize: '14px', fontWeight: '600', color: '#374151', marginBottom: '6px'}}>Price Range</label>
+                            <select value={form.priceRange} onChange={(e) => setForm({ ...form, priceRange: e.target.value })} style={{width: '100%', padding: '10px 14px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', outline: 'none', backgroundColor: 'white', boxSizing: 'border-box'}}>
                                 <option value="">Select range</option>
                                 {PRICE_RANGES.map((p) => <option key={p} value={p}>{p}</option>)}
                             </select>
                         </div>
                     </div>
+
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Photos & Videos (optional, max 10)</label>
+                        <label style={{display: 'block', fontSize: '14px', fontWeight: '600', color: '#374151', marginBottom: '6px'}}>Photos & Videos (optional, max 10)</label>
                         <input
                             type="file"
                             accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/mov"
@@ -200,16 +209,10 @@ const CreatePost: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                             onChange={async (e) => {
                                 const files = Array.from(e.target.files || []);
                                 if (files.length === 0) return;
-                                if (files.length > 10) {
-                                    setError('You can upload a maximum of 10 files.');
-                                    return;
-                                }
+                                if (files.length > 10) { setError('You can upload a maximum of 10 files.'); return; }
                                 const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg', 'video/mp4', 'video/webm', 'video/mov'];
                                 for (const file of files) {
-                                    if (!allowedTypes.includes(file.type)) {
-                                        setError(`Invalid format: ${file.name}. Only JPG, PNG, WEBP images and MP4, MOV, WEBM videos are allowed.`);
-                                        return;
-                                    }
+                                    if (!allowedTypes.includes(file.type)) { setError(`Invalid format: ${file.name}.`); return; }
                                 }
                                 try {
                                     const formData = new FormData();
@@ -230,12 +233,15 @@ const CreatePost: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                                     setError('Error uploading files. Please try again.');
                                 }
                             }}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-500"
+                            style={{width: '100%', padding: '10px 14px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', color: '#64748b', boxSizing: 'border-box'}}
                         />
-                        {form.images.length > 0 && <p className="text-xs text-green-600 mt-1">{form.images.length} image(s) ready to upload</p>}
-                        {(form as any).videos?.length > 0 && <p className="text-xs text-green-600 mt-1">{(form as any).videos.length} video(s) ready to upload</p>}
+                        {form.images.length > 0 && <p style={{fontSize: '12px', color: '#16a34a', marginTop: '6px'}}>{form.images.length} image(s) ready</p>}
+                        {(form as any).videos?.length > 0 && <p style={{fontSize: '12px', color: '#16a34a', marginTop: '4px'}}>{(form as any).videos.length} video(s) ready</p>}
                     </div>
-                    <button type="submit" className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">Share Experience</button>
+
+                    <button type="submit" style={{width: '100%', backgroundColor: '#4f46e5', color: 'white', padding: '14px', borderRadius: '10px', fontWeight: '700', border: 'none', cursor: 'pointer', fontSize: '15px'}}>
+                        Share Experience
+                    </button>
                 </form>
             </div>
         </div>
@@ -683,6 +689,27 @@ const Feed: React.FC = () => {
                     )}
                 </div>
             </nav>
+
+            {/* WELCOME BANNER */}
+                <div style={{backgroundColor: 'white', borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px'}}>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '16px'}}>
+                        <div style={{width: '52px', height: '52px', borderRadius: '50%', backgroundColor: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0}}>
+                            {currentUser?.avatar
+                                ? <img src={currentUser.avatar} alt={currentUser.username} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+                                : <User style={{width: '26px', height: '26px', color: 'white'}} />
+                            }
+                        </div>
+                        <div>
+                            <p style={{fontSize: '18px', fontWeight: '700', color: '#1e293b'}}>Welcome back, {currentUser?.username}! 👋</p>
+                            <p style={{fontSize: '14px', color: '#64748b', marginTop: '2px'}}>Ready to share your next adventure?</p>
+                        </div>
+                    </div>
+                    <button onClick={() => setView('create')} style={{backgroundColor: '#4f46e5', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '10px', cursor: 'pointer', fontWeight: '600', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px'}}>
+                        <Camera style={{width: '16px', height: '16px'}} />
+                        Share experience
+                    </button>
+                </div>
+
             <div style={{display: 'flex', gap: '48px', padding: '16px 32px', alignItems: 'flex-start', width:'100%'}}>
 
                 {/* COLUMN — FEED */}
