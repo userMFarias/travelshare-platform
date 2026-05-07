@@ -607,6 +607,7 @@ const Messages: React.FC<{ onBack: () => void; initialUser?: { userId: string; u
 // ================================================================
 const Feed: React.FC = () => {
     const { logout, currentUser } = useAuth();
+    const { unreadCount } = useMessage();
     const { filteredPosts, isLoading, searchFilters, setSearchFilters, toggleLike, addComment } = usePost();
     const [view, setView] = useState<'feed' | 'create' | 'profile' | 'messages'>('feed');
     const [showFilters, setShowFilters] = useState(false);
@@ -649,7 +650,15 @@ const Feed: React.FC = () => {
                                 <Camera className="w-5 h-5" /><span>Share</span>
                             </button>
                             <button onClick={() => setView('messages')} className="flex items-center space-x-1 px-3 py-2 hover:bg-gray-100 rounded-lg text-sm text-gray-600">
-                                <MessageSquare className="w-5 h-5" /><span>Messages</span>
+                                <div style={{position: 'relative'}}>
+                                    <MessageSquare className="w-5 h-5" />
+                                    {unreadCount > 0 && (
+                                        <div style={{position: 'absolute', top: '-6px', right: '-6px', backgroundColor: '#ef4444', color: 'white', borderRadius: '50%', width: '16px', height: '16px', fontSize: '10px', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                                            {unreadCount > 9 ? '9+' : unreadCount}
+                                        </div>
+                                    )}
+                                </div>
+                                <span>Messages</span>
                             </button>
                             <button onClick={() => setView('profile')} className="flex items-center space-x-1 px-3 py-2 hover:bg-gray-100 rounded-lg text-sm text-gray-600">
                                 <User className="w-5 h-5" /><span>Profile</span>
