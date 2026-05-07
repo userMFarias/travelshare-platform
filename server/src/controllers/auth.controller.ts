@@ -38,7 +38,8 @@ class AuthController {
                     username: user.username,
                     email: user.email,
                     bio: user.bio,
-                    country: user.country
+                    country: user.country,
+                    avatar: user.avatar
                 }
             });
         } catch (error) {
@@ -76,7 +77,8 @@ class AuthController {
                     username: user.username,
                     email: user.email,
                     bio: user.bio,
-                    country: user.country
+                    country: user.country,
+                    avatar: user.avatar
                 }
             });
         } catch (error) {

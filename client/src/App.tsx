@@ -302,8 +302,8 @@ const Profile: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <div className="bg-white rounded-xl shadow-md p-6">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-4">
-                            <div className="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center overflow-hidden">
-                                {form.avatar ? <img src={form.avatar} alt="avatar" className="w-full h-full object-cover" /> : <User className="w-10 h-10 text-white" />}
+                            <div style={{width: '80px', height: '80px', backgroundColor: '#4f46e5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0}}>
+                                {form.avatar ? <img src={form.avatar} alt="avatar" style={{width: '100%', height: '100%', objectFit: 'cover'}} /> : <User style={{width: '40px', height: '40px', color: 'white'}} />}
                             </div>
                             <div>
                                 <h2 className="text-2xl font-bold text-gray-800">{currentUser?.username}</h2>
@@ -408,8 +408,26 @@ const Profile: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                                 <h4 className="text-lg font-bold text-gray-800">{post.title}</h4>
                                 <p className="text-gray-600 mt-1">{post.content}</p>
                                 <p className="text-sm text-gray-400 flex items-center mt-2"><MapPin className="w-4 h-4 mr-1" />{post.country}, {post.region}</p>
+                                {post.images && post.images.length > 0 && (
+                                    <div style={{display: 'grid', gridTemplateColumns: post.images.length === 1 ? '1fr' : post.images.length === 2 ? '1fr 1fr' : '1fr 1fr 1fr', gap: '8px', marginTop: '12px'}}>
+                                        {post.images.map((img, i) => (
+                                            <img key={i} src={img} alt={`${post.title} ${i + 1}`}
+                                                style={{width: '100%', height: post.images.length === 1 ? 'auto' : '150px', maxHeight: post.images.length === 1 ? '300px' : '150px', objectFit: post.images.length === 1 ? 'contain' : 'cover', borderRadius: '8px', backgroundColor: '#f3f4f6'}}
+                                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                                {(post as any).videos && (post as any).videos.length > 0 && (
+                                    <div style={{marginTop: '12px'}}>
+                                        {(post as any).videos.map((vid: string, i: number) => (
+                                            <video key={i} src={vid} controls style={{width: '100%', maxHeight: '250px', borderRadius: '8px'}} />
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         ))}
+                        
                     </div>
                 )}
             </div>
@@ -420,7 +438,7 @@ const Profile: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 // ================================================================
 // MESSAGES SCREEN
 // ================================================================
-const Messages: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+const Messages: React.FC<{ onBack: () => void; initialUser?: { userId: string; username: string } | null }> = ({ onBack, initialUser }) => {
     const { currentUser } = useAuth();
     const { conversations, currentMessages, onlineUsers, loadConversations, loadConversation, sendMessage } = useMessage();
     const [selectedUser, setSelectedUser] = useState<{ userId: string; username: string } | null>(null);
@@ -429,6 +447,9 @@ const Messages: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
     useEffect(() => {
         loadConversations();
+        if (initialUser) {
+            handleSelectUser(initialUser.userId, initialUser.username);
+        }
     }, []);
 
     useEffect(() => {
@@ -444,6 +465,7 @@ const Messages: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         if (!newMessage.trim() || !selectedUser) return;
         await sendMessage(selectedUser.userId, selectedUser.username, newMessage);
         setNewMessage('');
+        await loadConversations();
     };
 
     return (
@@ -545,19 +567,20 @@ const Messages: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 // FEED SCREEN (MAIN)
 // ================================================================
 const Feed: React.FC = () => {
-    const { logout } = useAuth();
+    const { logout, currentUser } = useAuth();
     const { filteredPosts, isLoading, searchFilters, setSearchFilters, toggleLike, addComment } = usePost();
     const [view, setView] = useState<'feed' | 'create' | 'profile' | 'messages'>('feed');
     const [showFilters, setShowFilters] = useState(false);
     const [openComments, setOpenComments] = useState<string | null>(null);
     const [commentText, setCommentText] = useState('');
     const [lightbox, setLightbox] = useState<string | null>(null);
+    const [messagingUser, setMessagingUser] = useState<{ userId: string; username: string } | null>(null);
 
     if (view === 'create') return <CreatePost onBack={() => setView('feed')} />;
     if (view === 'profile') return <Profile onBack={() => setView('feed')} />;
     if (view === 'create') return <CreatePost onBack={() => setView('feed')} />;
     if (view === 'profile') return <Profile onBack={() => setView('feed')} />;
-    if (view === 'messages') return <Messages onBack={() => setView('feed')} />;
+    if (view === 'messages') return <Messages onBack={() => setView('feed')} initialUser={messagingUser} />;
     
 
     const handleComment = async (postId: string) => {
@@ -681,6 +704,18 @@ const Feed: React.FC = () => {
                                             <MessageSquare className="w-5 h-5" />
                                             <span>{post.comments?.length || 0}</span>
                                         </button>
+                                        {post.userId !== currentUser?.id && (
+                                        <button
+                                            onClick={() => {
+                                                setMessagingUser({ userId: post.userId, username: post.username });
+                                                setView('messages');
+                                            }}
+                                            className="flex items-center space-x-1 text-gray-500 hover:text-indigo-600"
+                                        >
+                                            <Send className="w-5 h-5" />
+                                            <span className="text-sm">Message</span>
+                                        </button>
+                                    )}
                                     </div>
                                 </div>
                                 {openComments === post.id && (
