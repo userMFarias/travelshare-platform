@@ -159,7 +159,8 @@ class PostController {
                 userId: user._id as any,
                 username: user.username,
                 content: req.body.content,
-                createdAt: new Date()
+                createdAt: new Date(),
+                replies: []
             });
 
             await post.save();
@@ -199,6 +200,40 @@ class PostController {
 
             const posts = await Post.find(filter).sort({ createdAt: -1 });
             res.json(posts);
+        } catch (error) {
+            res.status(500).json({ message: 'Server error', error });
+        }
+    }
+
+        async addReply(req: Request, res: Response): Promise<void> {
+        try {
+            const post = await Post.findById(req.params.id);
+            if (!post) {
+                res.status(404).json({ message: 'Post not found' });
+                return;
+            }
+
+            const user = await User.findById(req.user?.userId);
+            if (!user) {
+                res.status(404).json({ message: 'User not found' });
+                return;
+            }
+
+            const comment = post.comments.find(c => c._id?.toString() === req.params.commentId);
+            if (!comment) {
+                res.status(404).json({ message: 'Comment not found' });
+                return;
+            }
+
+            comment.replies.push({
+                userId: user._id as any,
+                username: user.username,
+                content: req.body.content,
+                createdAt: new Date()
+            });
+
+            await post.save();
+            res.status(201).json({ message: 'Reply added', post });
         } catch (error) {
             res.status(500).json({ message: 'Server error', error });
         }

@@ -171,6 +171,22 @@ class PostService {
 
         return await response.json();
     }
+
+    async addReply(postId: string, commentId: string, content: string): Promise<Post> {
+        const response = await fetch(`${API_URL}/posts/${postId}/comments/${commentId}/replies`, {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify({ content })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to add reply');
+        }
+
+        const data = await response.json();
+        return data.post;
+    }
 }
 
 export const postService = new PostService();

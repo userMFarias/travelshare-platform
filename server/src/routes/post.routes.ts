@@ -35,4 +35,7 @@ router.post('/:id/comments', authMiddleware, postController.addComment);
 // DELETE /api/posts/:id/comments/:commentId - Delete comment (Protected)
 router.delete('/:id/comments/:commentId', authMiddleware, postController.deleteComment);
 
+// POST /api/posts/:id/comments/:commentId/replies - Add reply (Protected)
+router.post('/:id/comments/:commentId/replies', authMiddleware, postController.addReply);
+
 export default router;

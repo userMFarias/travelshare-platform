@@ -16,6 +16,7 @@ interface PostContextType {
     addComment: (postId: string, content: string) => Promise<void>;
     deleteComment: (postId: string, commentId: string) => Promise<void>;
     refreshPosts: () => Promise<void>;
+    addReply: (postId: string, commentId: string, content: string) => Promise<void>;
 }
 
 const PostContext = createContext<PostContextType | undefined>(undefined);
@@ -167,6 +168,19 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
         await loadPosts();
     };
 
+        const addReply = async (postId: string, commentId: string, content: string) => {
+        if (!currentUser) {
+            throw new Error('Must be logged in to reply');
+        }
+        try {
+            const updatedPost = await postService.addReply(postId, commentId, content);
+            setPosts(posts.map((p) => (p.id === postId ? updatedPost : p)));
+        } catch (error) {
+            console.error('Error adding reply:', error);
+            throw error;
+        }
+    };
+
     const value: PostContextType = {
         posts,
         filteredPosts,
@@ -175,6 +189,7 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
         setSearchFilters,
         createPost,
         updatePost,
+        addReply,
         deletePost,
         toggleLike,
         addComment,

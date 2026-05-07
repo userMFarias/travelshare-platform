@@ -614,7 +614,7 @@ const Messages: React.FC<{ onBack: () => void; initialUser?: { userId: string; u
 const Feed: React.FC = () => {
     const { logout, currentUser } = useAuth();
     const { unreadCount } = useMessage();
-    const { filteredPosts, isLoading, searchFilters, setSearchFilters, toggleLike, addComment, deleteComment } = usePost();
+    const { filteredPosts, isLoading, searchFilters, setSearchFilters, toggleLike, addComment, addReply, deleteComment } = usePost();
     const [view, setView] = useState<'feed' | 'create' | 'profile' | 'messages'>('feed');
     const [showFilters, setShowFilters] = useState(false);
     const [openComments, setOpenComments] = useState<string | null>(null);
@@ -622,6 +622,8 @@ const Feed: React.FC = () => {
     const [lightbox, setLightbox] = useState<string | null>(null);
     const [confirmDelete, setConfirmDelete] = useState<{postId: string, commentId: string} | null>(null);
     const [messagingUser, setMessagingUser] = useState<{ userId: string; username: string } | null>(null);
+    const [replyingTo, setReplyingTo] = useState<{postId: string, commentId: string} | null>(null);
+    const [replyText, setReplyText] = useState('');
 
     if (view === 'create') return <CreatePost onBack={() => setView('feed')} />;
     if (view === 'profile') return <Profile onBack={() => setView('feed')} />;
@@ -804,6 +806,55 @@ const Feed: React.FC = () => {
                                                         <p className="font-semibold text-sm text-gray-800">{comment.username}</p>
                                                         <p className="text-gray-700 text-sm">{comment.content}</p>
                                                         <p className="text-xs text-gray-400 mt-1">{new Date(comment.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+
+                                                        <button
+                                                            onClick={() => setReplyingTo(replyingTo?.commentId === (comment.id || (comment as any)._id) ? null : {postId: post.id, commentId: comment.id || (comment as any)._id})}
+                                                            style={{fontSize: '12px', color: '#4f46e5', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0', marginTop: '4px'}}
+                                                        >
+                                                            {replyingTo?.commentId === (comment.id || (comment as any)._id) ? 'Cancel' : '↩ Reply'}
+                                                        </button>
+
+                                                        {replyingTo?.commentId === (comment.id || (comment as any)._id) && (
+                                                            <div style={{display: 'flex', gap: '8px', marginTop: '8px'}}>
+                                                                <input
+                                                                    type="text"
+                                                                    value={replyText}
+                                                                    onChange={(e) => setReplyText(e.target.value)}
+                                                                    onKeyDown={async (e) => {
+                                                                        if (e.key === 'Enter' && replyText.trim()) {
+                                                                            await addReply(post.id, comment.id || (comment as any)._id, replyText);
+                                                                            setReplyText('');
+                                                                            setReplyingTo(null);
+                                                                        }
+                                                                    }}
+                                                                    placeholder="Write a reply..."
+                                                                    style={{flex: 1, padding: '6px 12px', border: '1px solid #e2e8f0', borderRadius: '20px', fontSize: '13px', outline: 'none'}}
+                                                                />
+                                                                <button
+                                                                    onClick={async () => {
+                                                                        if (!replyText.trim()) return;
+                                                                        await addReply(post.id, comment.id || (comment as any)._id, replyText);
+                                                                        setReplyText('');
+                                                                        setReplyingTo(null);
+                                                                    }}
+                                                                    style={{padding: '6px 14px', backgroundColor: '#4f46e5', color: 'white', border: 'none', borderRadius: '20px', cursor: 'pointer', fontSize: '13px', fontWeight: '600'}}
+                                                                >
+                                                                    Send
+                                                                </button>
+                                                            </div>
+                                                        )}
+
+                                                        {(comment as any).replies?.length > 0 && (
+                                                            <div style={{marginTop: '8px', paddingLeft: '16px', borderLeft: '2px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '8px'}}>
+                                                                {(comment as any).replies.map((reply: any, ri: number) => (
+                                                                    <div key={ri}>
+                                                                        <p style={{fontSize: '13px', fontWeight: '600', color: '#1e293b'}}>{reply.username}</p>
+                                                                        <p style={{fontSize: '13px', color: '#475569'}}>{reply.content}</p>
+                                                                        <p style={{fontSize: '11px', color: '#94a3b8', marginTop: '2px'}}>{new Date(reply.createdAt).toLocaleDateString('en-GB', {day: 'numeric', month: 'long', year: 'numeric'})}</p>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     {comment.userId === currentUser?.id && (
                                                         <button
