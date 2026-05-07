@@ -443,6 +443,8 @@ const Messages: React.FC<{ onBack: () => void; initialUser?: { userId: string; u
     const { conversations, currentMessages, onlineUsers, loadConversations, loadConversation, sendMessage } = useMessage();
     const [selectedUser, setSelectedUser] = useState<{ userId: string; username: string } | null>(null);
     const [newMessage, setNewMessage] = useState('');
+    const [userSearch, setUserSearch] = useState('');
+    const [searchResults, setSearchResults] = useState<{id: string, username: string}[]>([]);
     const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -455,6 +457,21 @@ const Messages: React.FC<{ onBack: () => void; initialUser?: { userId: string; u
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [currentMessages]);
+
+    const handleUserSearch = async (query: string) => {
+        setUserSearch(query);
+        if (query.trim().length < 2) { setSearchResults([]); return; }
+        try {
+            const token = localStorage.getItem('travel_auth_token');
+            const res = await fetch(`http://localhost:5000/api/users/search?query=${query}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            setSearchResults(data.filter((u: any) => u.id !== currentUser?.id));
+        } catch (err) {
+            console.error(err);
+        }
+    };    
 
     const handleSelectUser = (userId: string, username: string) => {
         setSelectedUser({ userId, username });
@@ -482,7 +499,29 @@ const Messages: React.FC<{ onBack: () => void; initialUser?: { userId: string; u
                 {/* CONVERSATIONS LIST */}
                 <div style={{width: '300px', flexShrink: 0, backgroundColor: 'white', borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', overflow: 'hidden', display: 'flex', flexDirection: 'column'}}>
                     <div style={{padding: '20px', borderBottom: '1px solid #f1f5f9'}}>
-                        <h2 style={{fontSize: '18px', fontWeight: '700', color: '#1e293b'}}>Messages</h2>
+                        <h2 style={{fontSize: '18px', fontWeight: '700', color: '#1e293b', marginBottom: '12px'}}>Messages</h2>
+                        <input
+                            type="text"
+                            placeholder="Search users..."
+                            value={userSearch}
+                            onChange={(e) => handleUserSearch(e.target.value)}
+                            style={{width: '100%', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: '20px', fontSize: '13px', outline: 'none', boxSizing: 'border-box'}}
+                        />
+                        {searchResults.length > 0 && (
+                            <div style={{marginTop: '8px', backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden'}}>
+                                {searchResults.map((user) => (
+                                    <div key={user.id} onClick={() => { handleSelectUser(user.id, user.username); setUserSearch(''); setSearchResults([]); }}
+                                        style={{padding: '10px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #f1f5f9'}}
+                                        onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f8fafc')}
+                                        onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'white')}>
+                                        <div style={{width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+                                            <User style={{width: '16px', height: '16px', color: 'white'}} />
+                                        </div>
+                                        <span style={{fontSize: '14px', fontWeight: '500', color: '#1e293b'}}>{user.username}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                     <div style={{overflowY: 'auto', flex: 1}}>
                         {conversations.length === 0 ? (
