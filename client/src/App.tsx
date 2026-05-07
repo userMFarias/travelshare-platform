@@ -614,12 +614,13 @@ const Messages: React.FC<{ onBack: () => void; initialUser?: { userId: string; u
 const Feed: React.FC = () => {
     const { logout, currentUser } = useAuth();
     const { unreadCount } = useMessage();
-    const { filteredPosts, isLoading, searchFilters, setSearchFilters, toggleLike, addComment } = usePost();
+    const { filteredPosts, isLoading, searchFilters, setSearchFilters, toggleLike, addComment, deleteComment } = usePost();
     const [view, setView] = useState<'feed' | 'create' | 'profile' | 'messages'>('feed');
     const [showFilters, setShowFilters] = useState(false);
     const [openComments, setOpenComments] = useState<string | null>(null);
     const [commentText, setCommentText] = useState('');
     const [lightbox, setLightbox] = useState<string | null>(null);
+    const [confirmDelete, setConfirmDelete] = useState<{postId: string, commentId: string} | null>(null);
     const [messagingUser, setMessagingUser] = useState<{ userId: string; username: string } | null>(null);
 
     if (view === 'create') return <CreatePost onBack={() => setView('feed')} />;
@@ -798,10 +799,21 @@ const Feed: React.FC = () => {
                                         <h4 className="font-semibold text-gray-800 mb-3">Comments</h4>
                                         <div className="space-y-3 mb-4">
                                             {post.comments?.map((comment, i) => (
-                                                <div key={i} className="bg-gray-50 rounded-lg p-3">
-                                                    <p className="font-semibold text-sm text-gray-800">{comment.username}</p>
-                                                    <p className="text-gray-700 text-sm">{comment.content}</p>
-                                                    <p className="text-xs text-gray-400 mt-1">{new Date(comment.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                                                <div key={i} style={{backgroundColor: '#f8fafc', borderRadius: '8px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
+                                                    <div style={{flex: 1}}>
+                                                        <p className="font-semibold text-sm text-gray-800">{comment.username}</p>
+                                                        <p className="text-gray-700 text-sm">{comment.content}</p>
+                                                        <p className="text-xs text-gray-400 mt-1">{new Date(comment.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                                                    </div>
+                                                    {comment.userId === currentUser?.id && (
+                                                        <button
+                                                            onClick={() => setConfirmDelete({postId: post.id, commentId: comment.id || (comment as any)._id})}
+                                                            style={{background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', padding: '2px 6px', borderRadius: '4px', fontSize: '12px', flexShrink: 0}}
+                                                            title="Delete comment"
+                                                        >
+                                                            ✕
+                                                        </button>
+                                                    )}
                                                 </div>
                                             ))}
                                         </div>
@@ -859,6 +871,27 @@ const Feed: React.FC = () => {
                 >
                     <img src={lightbox} alt="Full size" style={{maxWidth: '90%', maxHeight: '90vh', objectFit: 'contain', borderRadius: '8px'}} />
                     <button style={{position: 'absolute', top: '20px', right: '30px', color: 'white', fontSize: '36px', background: 'none', border: 'none', cursor: 'pointer'}}>×</button>
+                </div>
+            )}
+
+            {confirmDelete && (
+                <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000}}>
+                    <div style={{backgroundColor: 'white', borderRadius: '16px', padding: '32px', maxWidth: '400px', width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.2)'}}>
+                        <h3 style={{fontSize: '18px', fontWeight: '700', color: '#1e293b', marginBottom: '8px'}}>Delete comment</h3>
+                        <p style={{fontSize: '14px', color: '#64748b', marginBottom: '24px'}}>Are you sure you want to delete this comment? This action cannot be undone.</p>
+                        <div style={{display: 'flex', gap: '12px', justifyContent: 'flex-end'}}>
+                            <button
+                                onClick={() => setConfirmDelete(null)}
+                                style={{padding: '10px 20px', borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: 'white', color: '#64748b', cursor: 'pointer', fontWeight: '600', fontSize: '14px'}}>
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => { deleteComment(confirmDelete.postId, confirmDelete.commentId); setConfirmDelete(null); }}
+                                style={{padding: '10px 20px', borderRadius: '8px', border: 'none', backgroundColor: '#ef4444', color: 'white', cursor: 'pointer', fontWeight: '600', fontSize: '14px'}}>
+                                Delete
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 
