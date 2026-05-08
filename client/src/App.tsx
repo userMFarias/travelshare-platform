@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { PostProvider, usePost } from './contexts/PostContext';
 import { PostFormData, SearchFilters, EXPERIENCE_TYPES, PRICE_RANGES } from './types';
-import { Earth, MapPin, Heart, MessageSquare, Search, Filter, Camera, User, LogOut, X, Send } from 'lucide-react';
+import { Earth, MapPin, Heart, MessageSquare, Search, Filter, Camera, User, LogOut, X, Send, Trash2 } from 'lucide-react';
 import { MessageProvider, useMessage } from './contexts/MessageContext';
 
 // ================================================================
@@ -260,6 +260,8 @@ const Profile: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const [credForm, setCredForm] = useState({ email: currentUser?.email || '', currentPassword: '', newPassword: '', confirmPassword: '' });
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
+    const { deletePost } = usePost();
+    const [confirmDeletePost, setConfirmDeletePost] = useState<string | null>(null);
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -411,7 +413,15 @@ const Profile: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     <div className="space-y-4">
                         {userPosts.map((post) => (
                             <div key={post.id} className="bg-white rounded-xl shadow-md p-6">
-                                <h4 className="text-lg font-bold text-gray-800">{post.title}</h4>
+                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
+                                    <h4 className="text-lg font-bold text-gray-800">{post.title}</h4>
+                                    <button
+                                        onClick={() => setConfirmDeletePost(post.id)}
+                                        style={{background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', padding: '4px'}}
+                                    >
+                                        <Trash2 style={{width: '18px', height: '18px'}} />
+                                    </button>
+                                </div>
                                 <p className="text-gray-600 mt-1">{post.content}</p>
                                 <p className="text-sm text-gray-400 flex items-center mt-2"><MapPin className="w-4 h-4 mr-1" />{post.country}, {post.region}</p>
                                 {post.images && post.images.length > 0 && (
@@ -436,8 +446,25 @@ const Profile: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         
                     </div>
                 )}
-            </div>
-        </div>
+                </div>
+
+                            {confirmDeletePost && (
+                                <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000}}>
+                                    <div style={{backgroundColor: 'white', borderRadius: '16px', padding: '32px', maxWidth: '400px', width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.2)'}}>
+                                        <h3 style={{fontSize: '18px', fontWeight: '700', color: '#1e293b', marginBottom: '8px'}}>Delete post</h3>
+                                        <p style={{fontSize: '14px', color: '#64748b', marginBottom: '24px'}}>Are you sure you want to delete this post? This action cannot be undone.</p>
+                                        <div style={{display: 'flex', gap: '12px', justifyContent: 'flex-end'}}>
+                                            <button onClick={() => setConfirmDeletePost(null)} style={{padding: '10px 20px', borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: 'white', color: '#64748b', cursor: 'pointer', fontWeight: '600', fontSize: '14px'}}>
+                                                Cancel
+                                            </button>
+                                            <button onClick={() => { deletePost(confirmDeletePost); setConfirmDeletePost(null); onBack(); }} style={{padding: '10px 20px', borderRadius: '8px', border: 'none', backgroundColor: '#ef4444', color: 'white', cursor: 'pointer', fontWeight: '600', fontSize: '14px'}}>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
     );
 };
 
@@ -620,7 +647,7 @@ const Feed: React.FC = () => {
     const [openComments, setOpenComments] = useState<string | null>(null);
     const [commentText, setCommentText] = useState('');
     const [lightbox, setLightbox] = useState<string | null>(null);
-    const [confirmDelete, setConfirmDelete] = useState<{postId: string, commentId: string} | null>(null);
+    const [confirmDelete, setConfirmDelete] = useState<{postId: string, commentId?: string, type: 'comment' | 'post'} | null>(null);
     const [messagingUser, setMessagingUser] = useState<{ userId: string; username: string } | null>(null);
     const [replyingTo, setReplyingTo] = useState<{postId: string, commentId: string} | null>(null);
     const [replyText, setReplyText] = useState('');
@@ -794,6 +821,15 @@ const Feed: React.FC = () => {
                                             <span className="text-sm">Message</span>
                                         </button>
                                     )}
+
+                                    {post.userId === currentUser?.id && (
+                                        <button
+                                            onClick={() => setConfirmDelete({postId: post.id, type: 'post'})}
+                                            className="flex items-center space-x-1 text-gray-500 hover:text-red-600"
+                                        >
+                                            <Trash2 className="w-5 h-5" />
+                                        </button>
+                                    )}
                                     </div>
                                 </div>
                                 {openComments === post.id && (
@@ -858,7 +894,7 @@ const Feed: React.FC = () => {
                                                     </div>
                                                     {comment.userId === currentUser?.id && (
                                                         <button
-                                                            onClick={() => setConfirmDelete({postId: post.id, commentId: comment.id || (comment as any)._id})}
+                                                            onClick={() => setConfirmDelete({postId: post.id, commentId: comment.id || (comment as any)._id, type: 'comment'})}
                                                             style={{background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', padding: '2px 6px', borderRadius: '4px', fontSize: '12px', flexShrink: 0}}
                                                             title="Delete comment"
                                                         >
@@ -928,8 +964,12 @@ const Feed: React.FC = () => {
             {confirmDelete && (
                 <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000}}>
                     <div style={{backgroundColor: 'white', borderRadius: '16px', padding: '32px', maxWidth: '400px', width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.2)'}}>
-                        <h3 style={{fontSize: '18px', fontWeight: '700', color: '#1e293b', marginBottom: '8px'}}>Delete comment</h3>
-                        <p style={{fontSize: '14px', color: '#64748b', marginBottom: '24px'}}>Are you sure you want to delete this comment? This action cannot be undone.</p>
+                        <h3 style={{fontSize: '18px', fontWeight: '700', color: '#1e293b', marginBottom: '8px'}}>
+                            {confirmDelete.type === 'post' ? 'Delete post' : 'Delete comment'}
+                        </h3>
+                        <p style={{fontSize: '14px', color: '#64748b', marginBottom: '24px'}}>
+                            {confirmDelete.type === 'post' ? 'Are you sure you want to delete this post? This action cannot be undone.' : 'Are you sure you want to delete this comment? This action cannot be undone.'}
+                        </p>
                         <div style={{display: 'flex', gap: '12px', justifyContent: 'flex-end'}}>
                             <button
                                 onClick={() => setConfirmDelete(null)}
@@ -937,7 +977,14 @@ const Feed: React.FC = () => {
                                 Cancel
                             </button>
                             <button
-                                onClick={() => { deleteComment(confirmDelete.postId, confirmDelete.commentId); setConfirmDelete(null); }}
+                                onClick={() => {
+                                    if (confirmDelete.type === 'post') {
+                                        deletePost(confirmDelete.postId);
+                                    } else {
+                                        deleteComment(confirmDelete.postId, confirmDelete.commentId!);
+                                    }
+                                    setConfirmDelete(null);
+                                }}
                                 style={{padding: '10px 20px', borderRadius: '8px', border: 'none', backgroundColor: '#ef4444', color: 'white', cursor: 'pointer', fontWeight: '600', fontSize: '14px'}}>
                                 Delete
                             </button>
