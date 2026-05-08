@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useAuth } from './contexts/AuthContext';
+import { Earth, Heart } from 'lucide-react';
 import { AuthProvider } from './contexts/AuthContext';
 import { PostProvider } from './contexts/PostContext';
 import { MessageProvider } from './contexts/MessageContext';
 import Feed from './components/Feed';
 import Login from './components/Login';
-import Register from './components/Register';
+import Register from './components/Register.tsx';
 
 
 // ================================================================
