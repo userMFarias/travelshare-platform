@@ -23,6 +23,7 @@ class PostController {
             }
 
             const images = req.body.images || [];
+            const videos = req.body.videos || [];
 
             const post = await Post.create({
                 userId: user._id,
@@ -33,6 +34,7 @@ class PostController {
                 title,
                 content,
                 images,
+                videos,
                 experienceType,
                 priceRange
             });

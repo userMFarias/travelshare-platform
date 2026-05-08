@@ -424,9 +424,9 @@ const Profile: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                                         ))}
                                     </div>
                                 )}
-                                {(post as any).videos && (post as any).videos.length > 0 && (
+                                {post.videos && post.videos.length > 0 && (
                                     <div style={{marginTop: '12px'}}>
-                                        {(post as any).videos.map((vid: string, i: number) => (
+                                        {post.videos.map((vid, i) => (
                                             <video key={i} src={vid} controls style={{width: '100%', maxHeight: '250px', borderRadius: '8px'}} />
                                         ))}
                                     </div>
@@ -760,9 +760,9 @@ const Feed: React.FC = () => {
                                     ))}
                                 </div>
                             )}
-                            {(post as any).videos && (post as any).videos.length > 0 && (
+                            {post.videos && post.videos.length > 0 && (
                                 <div className="grid gap-2 mb-4 grid-cols-1">
-                                    {(post as any).videos.map((vid: string, i: number) => (
+                                    {post.videos.map((vid: string, i: number) => (
                                         <video
                                             key={i}
                                             src={vid}

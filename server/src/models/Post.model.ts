@@ -26,6 +26,7 @@ export interface IPost extends Document {
     title: string;
     content: string;
     images: string[];
+    videos: string[];
     experienceType: string;
     priceRange?: string;
     likes: number;
@@ -117,6 +118,10 @@ const PostSchema = new Schema<IPost>(
                 },
                 message: 'Cannot upload more than 5 images'
             }
+        },
+        videos: {
+            type: [String],
+            default: []
         },
         experienceType: {
             type: String,
