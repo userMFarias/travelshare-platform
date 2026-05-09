@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Camera, User, X, Trash2 } from 'lucide-react';
+import { MapPin, Camera, User, X, Trash2, Heart } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePost } from '../contexts/PostContext';
 
@@ -17,6 +17,8 @@ const Profile: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const [error, setError] = useState('');
     const { deletePost } = usePost();
     const [confirmDeletePost, setConfirmDeletePost] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<'myPosts' | 'likedPosts'>('myPosts');
+    const likedPosts = posts.filter((p) => p.isLiked);
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -157,51 +159,93 @@ const Profile: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     </div>
                 )}
 
-                {/* MY POSTS */}
-                <h3 className="text-xl font-bold text-gray-800">My Posts</h3>
-                {userPosts.length === 0 ? (
-                    <div className="bg-white rounded-xl shadow-md p-8 text-center">
-                        <Camera className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-500">No posts yet. Share your first experience!</p>
-                    </div>
-                ) : (
-                    <div className="space-y-4">
-                        {userPosts.map((post) => (
-                            <div key={post.id} className="bg-white rounded-xl shadow-md p-6">
-                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
-                                    <h4 className="text-lg font-bold text-gray-800">{post.title}</h4>
-                                    <button
-                                        onClick={() => setConfirmDeletePost(post.id)}
-                                        style={{background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', padding: '4px'}}
-                                    >
-                                        <Trash2 style={{width: '18px', height: '18px'}} />
-                                    </button>
+                {/* TABS */}
+                <div style={{display: 'flex', gap: '0', borderBottom: '2px solid #e2e8f0', marginBottom: '16px'}}>
+                    <button
+                        onClick={() => setActiveTab('myPosts')}
+                        style={{padding: '10px 24px', fontWeight: '600', fontSize: '14px', border: 'none', cursor: 'pointer', backgroundColor: 'transparent', color: activeTab === 'myPosts' ? '#4f46e5' : '#64748b', borderBottom: activeTab === 'myPosts' ? '2px solid #4f46e5' : '2px solid transparent', marginBottom: '-2px'}}
+                    >
+                        My Posts ({userPosts.length})
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('likedPosts')}
+                        style={{padding: '10px 24px', fontWeight: '600', fontSize: '14px', border: 'none', cursor: 'pointer', backgroundColor: 'transparent', color: activeTab === 'likedPosts' ? '#4f46e5' : '#64748b', borderBottom: activeTab === 'likedPosts' ? '2px solid #4f46e5' : '2px solid transparent', marginBottom: '-2px'}}
+                    >
+                        Liked Posts ({likedPosts.length})
+                    </button>
+                </div>
+                {activeTab === 'myPosts' ? (
+                    userPosts.length === 0 ? (
+                        <div className="bg-white rounded-xl shadow-md p-8 text-center">
+                            <Camera className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                            <p className="text-gray-500">No posts yet. Share your first experience!</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {userPosts.map((post) => (
+                                <div key={post.id} className="bg-white rounded-xl shadow-md p-6">
+                                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
+                                        <h4 className="text-lg font-bold text-gray-800">{post.title}</h4>
+                                        <button
+                                            onClick={() => setConfirmDeletePost(post.id)}
+                                            style={{background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', padding: '4px'}}
+                                        >
+                                            <Trash2 style={{width: '18px', height: '18px'}} />
+                                        </button>
+                                    </div>
+                                    <p className="text-gray-600 mt-1">{post.content}</p>
+                                    <p className="text-sm text-gray-400 flex items-center mt-2"><MapPin className="w-4 h-4 mr-1" />{post.country}, {post.region}</p>
+                                    {post.images && post.images.length > 0 && (
+                                        <div style={{display: 'grid', gridTemplateColumns: post.images.length === 1 ? '1fr' : post.images.length === 2 ? '1fr 1fr' : '1fr 1fr 1fr', gap: '8px', marginTop: '12px'}}>
+                                            {post.images.map((img, i) => (
+                                                <img key={i} src={img} alt={`${post.title} ${i + 1}`}
+                                                    style={{width: '100%', height: post.images.length === 1 ? 'auto' : '150px', maxHeight: post.images.length === 1 ? '300px' : '150px', objectFit: post.images.length === 1 ? 'contain' : 'cover', borderRadius: '8px', backgroundColor: '#f3f4f6'}}
+                                                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
+                                    {post.videos && post.videos.length > 0 && (
+                                        <div style={{marginTop: '12px'}}>
+                                            {post.videos.map((vid, i) => (
+                                                <video key={i} src={vid} controls style={{width: '100%', maxHeight: '250px', borderRadius: '8px'}} />
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
-                                <p className="text-gray-600 mt-1">{post.content}</p>
-                                <p className="text-sm text-gray-400 flex items-center mt-2"><MapPin className="w-4 h-4 mr-1" />{post.country}, {post.region}</p>
-                                {post.images && post.images.length > 0 && (
-                                    <div style={{display: 'grid', gridTemplateColumns: post.images.length === 1 ? '1fr' : post.images.length === 2 ? '1fr 1fr' : '1fr 1fr 1fr', gap: '8px', marginTop: '12px'}}>
-                                        {post.images.map((img, i) => (
-                                            <img key={i} src={img} alt={`${post.title} ${i + 1}`}
-                                                style={{width: '100%', height: post.images.length === 1 ? 'auto' : '150px', maxHeight: post.images.length === 1 ? '300px' : '150px', objectFit: post.images.length === 1 ? 'contain' : 'cover', borderRadius: '8px', backgroundColor: '#f3f4f6'}}
-                                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                            />
-                                        ))}
-                                    </div>
-                                )}
-                                {post.videos && post.videos.length > 0 && (
-                                    <div style={{marginTop: '12px'}}>
-                                        {post.videos.map((vid, i) => (
-                                            <video key={i} src={vid} controls style={{width: '100%', maxHeight: '250px', borderRadius: '8px'}} />
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                        
-                    </div>
+                            ))}
+                        </div>
+                    )
+                ) : (
+                    likedPosts.length === 0 ? (
+                        <div className="bg-white rounded-xl shadow-md p-8 text-center">
+                            <Heart style={{width: '64px', height: '64px', color: '#9ca3af', margin: '0 auto 16px'}} />
+                            <p className="text-gray-500">No liked posts yet.</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {likedPosts.map((post) => (
+                                <div key={post.id} className="bg-white rounded-xl shadow-md p-6">
+                                    <p style={{fontSize: '13px', color: '#64748b', marginBottom: '4px'}}>by {post.username}</p>
+                                    <h4 className="text-lg font-bold text-gray-800">{post.title}</h4>
+                                    <p className="text-gray-600 mt-1">{post.content}</p>
+                                    <p className="text-sm text-gray-400 flex items-center mt-2"><MapPin className="w-4 h-4 mr-1" />{post.country}, {post.region}</p>
+                                    {post.images && post.images.length > 0 && (
+                                        <div style={{display: 'grid', gridTemplateColumns: post.images.length === 1 ? '1fr' : post.images.length === 2 ? '1fr 1fr' : '1fr 1fr 1fr', gap: '8px', marginTop: '12px'}}>
+                                            {post.images.map((img, i) => (
+                                                <img key={i} src={img} alt={`${post.title} ${i + 1}`}
+                                                    style={{width: '100%', height: post.images.length === 1 ? 'auto' : '150px', maxHeight: post.images.length === 1 ? '300px' : '150px', objectFit: post.images.length === 1 ? 'contain' : 'cover', borderRadius: '8px', backgroundColor: '#f3f4f6'}}
+                                                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )
                 )}
-               </div>
+            </div>    
 
             {confirmDeletePost && (
                 <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000}}>

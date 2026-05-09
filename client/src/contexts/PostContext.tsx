@@ -45,8 +45,10 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
     });
 
     useEffect(() => {
-        loadPosts();
-    }, []);
+        if (currentUser) {
+            loadPosts();
+        }
+    }, [currentUser]);
 
     useEffect(() => {
         applyFilters();
@@ -56,7 +58,13 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
         try {
             setIsLoading(true);
             const allPosts = await postService.getAllPosts();
-            setPosts(allPosts);
+            console.log('First post likedBy:', allPosts[0]?.likedBy);
+            console.log('currentUser id:', currentUser?.id);
+            const postsWithLiked = allPosts.map((post: any) => ({
+                ...post,
+                isLiked: post.likedBy?.includes(currentUser?.id) || false
+            }));
+            setPosts(postsWithLiked);
         } catch (error) {
             console.error('Error loading posts:', error);
         } finally {
