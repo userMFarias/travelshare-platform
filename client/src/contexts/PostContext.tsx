@@ -137,7 +137,11 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
 
         try {
             const updatedPost = await postService.toggleLike(postId);
-            setPosts(posts.map((p) => (p.id === postId ? updatedPost : p)));
+            const updatedPostWithLiked = {
+                ...updatedPost,
+                isLiked: (updatedPost as any).likedBy?.includes(currentUser.id) || false
+            };
+            setPosts(posts.map((p) => (p.id === postId ? updatedPostWithLiked : p)));
         } catch (error) {
             console.error('Error toggling like:', error);
             throw error;
