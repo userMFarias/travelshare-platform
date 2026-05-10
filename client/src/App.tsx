@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from './contexts/AuthContext';
-import { Earth, Heart } from 'lucide-react';
+import { Earth } from 'lucide-react';
 import { AuthProvider } from './contexts/AuthContext';
 import { PostProvider } from './contexts/PostContext';
 import { MessageProvider } from './contexts/MessageContext';

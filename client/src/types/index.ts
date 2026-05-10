@@ -17,6 +17,8 @@ export interface Post {
     title: string;
     content: string;
     images: string[];
+    videos:string[];
+    likedBy: string[];
     experienceType: string;
     priceRange?: string;
     createdAt: string;

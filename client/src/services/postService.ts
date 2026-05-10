@@ -1,4 +1,4 @@
-import { Post, PostFormData, Comment, SearchFilters } from '../types';
+import { Post, PostFormData, SearchFilters } from '../types';
 import { authService } from './authService';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
