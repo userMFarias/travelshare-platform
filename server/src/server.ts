@@ -16,6 +16,8 @@ import { apiLimiter } from './middleware/rateLimit.middleware';
 dotenv.config({ path: require('path').resolve(__dirname, '../.env') });
 
 const app: Application = express();
+app.set('trust proxy', 1);
+
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
