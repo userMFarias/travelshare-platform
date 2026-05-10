@@ -31,7 +31,8 @@ const Messages: React.FC<{ onBack: () => void; initialUser?: { userId: string; u
         if (query.trim().length < 2) { setSearchResults([]); return; }
         try {
             const token = localStorage.getItem('travel_auth_token');
-            const res = await fetch(`http://localhost:5000/api/users/search?query=${query}`, {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+            const res = await fetch(`${API_URL}/users/search?query=${query}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();

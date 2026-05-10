@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User.model';
+import { sendNewUserNotification } from '../config/email';
 
 class AuthController {
     async register(req: Request, res: Response): Promise<void> {
@@ -23,6 +24,8 @@ class AuthController {
                 bio,
                 country
             });
+
+            await sendNewUserNotification(username, email);
 
             const token = jwt.sign(
                 { userId: user._id.toString(), email: user.email },

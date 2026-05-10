@@ -13,7 +13,7 @@ import { errorHandler, notFoundHandler } from './middleware/error.middleware';
 import { corsOptions } from './middleware/cors.middleware';
 import { apiLimiter } from './middleware/rateLimit.middleware';
 
-dotenv.config();
+dotenv.config({ path: require('path').resolve(__dirname, '../.env') });
 
 const app: Application = express();
 const httpServer = createServer(app);
