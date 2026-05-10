@@ -55,10 +55,10 @@ const Help: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const faqs = [
         { q: 'Is TravelShare free?', a: 'Yes, TravelShare is completely free to use. Create an account and start sharing your experiences at no cost.' },
         { q: 'How do I reset my password?', a: 'Go to your Profile, click Edit Profile and use the Change Email / Password section. You will need your current password to make changes.' },
-        { q: 'Can I delete my posts?', a: 'This feature is coming soon. For now, please contact us if you need a post removed.' },
-        { q: 'What types of content can I share?', a: 'You can share photos and short videos (up to 30 seconds) of your travel experiences, along with descriptions, budget information and experience type.' },
+        { q: 'Can I delete my posts?', a: 'Yes, you can delete your own posts at any time. Click the trash icon on any of your posts and confirm the deletion in the dialog that appears.' },
+        { q: 'What types of content can I share?', a: 'You can share photos and videos of your travel experiences, along with descriptions, budget information and experience type. Up to 10 files per post are supported.' },
         { q: 'How do I report inappropriate content?', a: 'We are working on a reporting system. In the meantime, please contact us via the Help page and we will address it promptly.' },
-        { q: 'Can I use TravelShare on my phone?', a: 'Yes, TravelShare is optimised for mobile devices and works on any modern browser.' },
+        { q: 'Can I use TravelShare on my phone?', a: 'TravelShare is a web application accessible from any modern browser on desktop or mobile devices.' },
     ];
 
     return (
