@@ -1,7 +1,6 @@
 import { Resend } from 'resend';
 
 export const sendNewUserNotification = async (username: string, email: string) => {
-    console.log('RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
     const resend = new Resend(process.env.RESEND_API_KEY);
     try {
         const { data, error } = await resend.emails.send({
