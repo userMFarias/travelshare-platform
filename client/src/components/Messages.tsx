@@ -48,7 +48,7 @@ const Messages: React.FC<{ onBack: () => void; initialUser?: { userId: string; u
 
     const handleSend = async () => {
         if (!newMessage.trim() || !selectedUser) return;
-        await sendMessage(selectedUser.userId, selectedUser.username, newMessage);
+        await sendMessage(selectedUser.userId, newMessage);
         setNewMessage('');
         await loadConversations();
     };
