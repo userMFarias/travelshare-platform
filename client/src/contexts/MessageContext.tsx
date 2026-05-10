@@ -29,7 +29,7 @@ interface MessageContextType {
     onlineUsers: string[];
     loadConversations: () => Promise<void>;
     loadConversation: (userId: string) => Promise<void>;
-    sendMessage: (receiverId: string, receiverUsername: string, content: string) => Promise<void>;
+    sendMessage: (receiverId: string, content: string) => Promise<void>;
     resetUnreadCount: () => void;
 }
 
@@ -113,7 +113,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
     };
 
-    const sendMessage = async (receiverId: string, receiverUsername: string, content: string) => {
+    const sendMessage = async (receiverId: string, content: string) => {
         try {
             const res = await fetch(`${API_URL}/messages`, {
                 method: 'POST',

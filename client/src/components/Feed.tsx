@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Earth, MapPin, Heart, MessageSquare, Search, Filter, Camera, User, LogOut, X, Send, Trash2 } from 'lucide-react';
+import { Earth, MapPin, Heart, MessageSquare, Search, Filter, Camera, User, LogOut, Send, Trash2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePost } from '../contexts/PostContext';
 import { useMessage } from '../contexts/MessageContext';
