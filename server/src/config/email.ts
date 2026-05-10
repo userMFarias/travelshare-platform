@@ -1,22 +1,12 @@
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 export const sendNewUserNotification = async (username: string, email: string) => {
-    
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        },
-        family: 4
-    } as any);
-
+    console.log('RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
+    const resend = new Resend(process.env.RESEND_API_KEY);
     try {
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: process.env.NOTIFICATION_EMAIL,
+        const { data, error } = await resend.emails.send({
+            from: 'onboarding@resend.dev',
+            to: process.env.NOTIFICATION_EMAIL || 'mirianfariasp@gmail.com',
             subject: 'New TravelShare registration',
             html: `
                 <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto;">
@@ -29,8 +19,12 @@ export const sendNewUserNotification = async (username: string, email: string) =
                 </div>
             `
         });
-        console.log('New user notification sent');
+        if (error) {
+            console.error('Resend error:', JSON.stringify(error));
+        } else {
+            console.log('New user notification sent:', data);
+        }
     } catch (error) {
-        console.error('Error sending notification email:', error);
+        console.error('Error sending notification email:', JSON.stringify(error));
     }
 };
