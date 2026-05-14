@@ -34,9 +34,9 @@ async function runTests() {
 
     try {
         // ================================================================
-        // TC-01 — Registro con datos válidos
+        // TC-01  Registration with valid data
         // ================================================================
-        console.log('\n TC-01 — Registro con datos válidos');
+        console.log('\n TC-01 — Registration with valid data');
         await driver.get(BASE_URL);
         await sleep(3000);
 
@@ -45,21 +45,21 @@ async function runTests() {
         await registerBtn.click();
         await sleep(500);
 
-        // Rellenar formulario
+        // Fill the form
         await driver.findElement(By.xpath("//input[@type='text'][1]")).sendKeys(TEST_USERNAME);
         await driver.findElement(By.xpath("//input[@type='email']")).sendKeys(TEST_EMAIL);
         await driver.findElement(By.xpath("//input[@type='password']")).sendKeys(TEST_PASSWORD);
         await driver.findElement(By.xpath("//button[contains(text(), 'Create Account')]")).click();
         await sleep(2000);
 
-        // Verificar que llegamos al feed
+        // Verify that we reached the feed
         const feedTitle = await driver.findElement(By.xpath("//*[contains(text(), 'Recent Posts')]"));
         await assert('Usuario registrado correctamente y redirigido al feed', feedTitle !== null);
 
         // ================================================================
-        // TC-03 — Logout y Login con credenciales correctas
+        // TC-03 Logout and Login with correct credentials
         // ================================================================
-        console.log('\n TC-03 — Login con credenciales correctas');
+        console.log('\n TC-03 Logout and Login with correct credentials');
 
         // Logout
         const logoutBtn = await driver.findElement(By.xpath("//button[.//span[contains(text(), 'Log out')]]"));
@@ -68,10 +68,10 @@ async function runTests() {
         await driver.navigate().refresh();
         await sleep(2000);
 
-        // Esperar a que aparezca el formulario de login
+    
         await driver.wait(until.elementLocated(By.xpath("//input[@type='email']")), 5000);
 
-        // Login - limpiar campos primero
+        
         const emailInput = await driver.findElement(By.xpath("//input[@type='email']"));
         const passwordInput = await driver.findElement(By.xpath("//input[@type='password']"));
         await emailInput.clear();
@@ -79,7 +79,7 @@ async function runTests() {
         await emailInput.sendKeys(TEST_EMAIL);
         await passwordInput.sendKeys(TEST_PASSWORD);
 
-        // Buscar el botón por su posición en el formulario
+        // Find the button by its position on the form
         const loginBtn = await driver.findElement(By.xpath("//button[@type='submit']"));
         await loginBtn.click();
         await sleep(5000);
@@ -90,9 +90,9 @@ async function runTests() {
         await assert('Login correcto, usuario redirigido al feed', feedAfterLogin !== null);
 
         // ================================================================
-        // TC-04 — Login con contraseña incorrecta
+        // TC-04 Login with incorrect password
         // ================================================================
-        console.log('\n TC-04 — Login con contraseña incorrecta');
+        console.log('\n TC-04  Login with incorrect password');
 
         // Logout
         const logoutBtn2 = await driver.findElement(By.xpath("//button[.//span[contains(text(), 'Log out')]]"));
@@ -108,9 +108,9 @@ async function runTests() {
         await assert('Mensaje de error mostrado con contraseña incorrecta', errorMsg !== null);
 
         // ================================================================
-        // TC-02 — Registro con email duplicado
+        // TC-02 Registration with duplicate email
         // ================================================================
-        console.log('\n TC-02 — Registro con email duplicado');
+        console.log('\n TC-02 Registration with duplicate email');
 
         const registerBtn2 = await driver.findElement(By.xpath("//button[contains(text(), 'Register')]"));
         await registerBtn2.click();
@@ -130,7 +130,7 @@ async function runTests() {
         failed++;
     } finally {
         await driver.quit();
-        console.log(`\n Resultados: ${passed} pasados, ${failed} fallados`);
+        console.log(`\n Results: ${passed} passed, ${failed} failed`);
         if (failed > 0) process.exit(1);
     }
 }
