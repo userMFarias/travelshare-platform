@@ -118,8 +118,15 @@ class PostService {
             throw new Error(error.message || 'Failed to like post');
         }
 
-        const data = await response.json();
-        return data.post;
+    const data = await response.json();
+    return {
+        ...data.post,
+        id: data.post._id || data.post.id,
+        comments: data.post.comments?.map((comment: any) => ({
+            ...comment,
+            id: comment._id || comment.id
+        })) || []
+    };
     }
 
     async addComment(postId: string, content: string): Promise<Post> {

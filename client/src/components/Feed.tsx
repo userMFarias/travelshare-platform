@@ -31,6 +31,7 @@ const Feed: React.FC = () => {
     
 
     const handleComment = async (postId: string) => {
+        console.log('postId:', postId);
         if (!commentText.trim()) return;
         try {
             await addComment(postId, commentText);
